@@ -1,0 +1,43 @@
+<%= form_for(['blocks',@chain]) do |f| %>
+<div class="box-body">
+  <div class="col-md-5">
+    <div class="form-group has-error">
+      <label>区块</label>
+      <div class="input-group">
+        <div class="input-group-addon">
+          <i class="fa fa-btc"></i>
+        </div>
+        <%= f.text_field :block, class:'form-control', placeholder:'（必填* 区块链）' %>
+      </div>
+      <%= model_errors(@chain,'block') %>
+    </div>
+    <div class="form-group has-error">
+      <label>货币</label>
+      <div class="input-group">
+        <div class="input-group-addon">
+          <i class="fa fa-money"></i>
+        </div>
+        <%= f.text_field :currency, class:'form-control', placeholder:'（必填* 区块链交易货币）' %>
+      </div>
+      <%= model_errors(@chain,'currency') %>
+    </div>
+    <div class="form-group has-error">
+      <label>名称</label>
+      <div class="input-group">
+        <div class="input-group-addon">
+          <i class="fa fa-cc-mastercard"></i>
+        </div>
+        <%= f.text_field :label, class:'form-control', placeholder:'（必填* 区块链名称）' %>
+      </div>
+      <%= model_errors(@chain,'label') %>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <hr>
+    <div>
+      <button type="submit" class="btn bg-maroon btn-flat" style="width: 120px">提交</button>
+      <a href="<%= request.referrer %>" class="btn bg-navy btn-flat" style="width: 120px">取消</a>
+    </div>
+  </div>
+</div>
+<% end %>

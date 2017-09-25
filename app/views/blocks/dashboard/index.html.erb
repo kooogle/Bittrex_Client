@@ -1,0 +1,94 @@
+<%= content_for(:title,  '每日行情 | Block') %>
+<%= content_for :script do %>
+  <%= javascript_include_tag 'chart', 'data-turbolinks-track' => true %>
+<% end %>
+<section class="content-header">
+  <h1>
+    <%= @block.full_name %>行情  <small>信息预览</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+    <li class="active"><i class="fa fa-line-chart"></i> 每日行情 </li>
+  </ol>
+</section>
+<section class="content">
+  <div class="box box-primary">
+    <div class="box-header">
+      <div class="row">
+        <div class="col-sm-2">
+          <select onchange="javascript:location.href = this.value;" class="form-control" style="display: inline;">
+            <option value="?">请选择区块链</option>
+            <% Chain.named.each do |item|%>
+              <option value="?block=<%= item.id %>&start=<%= params[:start] || Date.current.to_s %>&end=<%= params[:end] || Date.current.to_s %>" <%= 'selected' if params[:block].to_i == item.id %>><%= item.full_name %></option>
+            <% end %>
+          </select>
+        </div>
+        <div class="col-sm-9">
+          <form action="<%= blocks_ticker_path %>" method="get">
+            <div class="col-sm-3">
+              <div class="form-group has-feedback">
+                <div class="input-group">
+                  <input id='start' type="text" name="start" value="<%= params[:start] || Date.current.to_s %>" class="form-control" placeholder="起始日期">
+                  <input type="hidden" name="block" value="<%= params[:block] || 'btc'%>">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="form-group has-feedback">
+                <div class="input-group">
+                  <input id='end' type="text" name="end" value="<%= params[:end] || Date.current.to_s %>" class="form-control" placeholder="截止日期">
+                  <span class="input-group-btn">
+                    <button class="btn btn-default btn-flat" type="submit"><i class="fa fa-search-plus"></i></button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="box-body">
+      <div class="row">
+        <div class="col-sm-12">
+        <canvas id="myChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script type="text/javascript">
+  var ctx = document.getElementById("myChart").getContext('2d');
+  var myLineChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: <%= raw @date_array %>,
+        datasets: [
+          {
+            label: "市价线",
+            data: <%= @value_array %>,
+            fill: false,
+            backgroundColor: 'rgba(27,129,62,0.2)',
+            borderColor: 'rgba(27,129,62, 1)',
+            lineTension: 0.25
+          },
+          {
+            label: "均价线",
+            data: <%= @ma5_array %>,
+            fill: false,
+            backgroundColor: 'rgba(203, 27, 69,0.2)',
+            borderColor: 'rgba(203, 27, 69, 1)',
+            lineTension: 0.25
+          }
+        ]
+      },
+      options: {
+        duration: 200,
+        title: {
+          display: true,
+          fontSize: 18,
+          fontColor: 'rgba(246, 81, 29, 1)',
+          text: "<%= @block.full_name %> 每日行情"
+        }
+      }
+  });
+</script>
