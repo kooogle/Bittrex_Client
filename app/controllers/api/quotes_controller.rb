@@ -2,7 +2,7 @@ class Api::QuotesController < ApplicationController
 
   def hit_tickers
     Chain.all.each do |item|
-      sync_quote(item) rescue nil
+      item.generate_ticker rescue nil
     end
     render json:{code:200}
   end

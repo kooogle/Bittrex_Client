@@ -75,4 +75,8 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :api do
+    get 'hit_tickers', to:'quotes#hit_tickers'
+  end
+
 end
