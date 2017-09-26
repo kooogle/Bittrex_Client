@@ -36,5 +36,15 @@
         </a>
       </li>
     <% end %>
+    <li class="treeview <%= 'active' if controller_name == 'points' %>">
+      <a href="<%= blocks_points_path %>" target="_self">
+        <i class="fa fa-adjust"></i> <span> 事务焦点</span>
+      </a>
+    </li>
+    <li class="treeview <%= 'active' if controller_name == 'orders' %>">
+      <a href="<%= blocks_orders_path %>" target="_self">
+        <i class="fa fa-random"></i> <span> 交易订单</span>
+      </a>
+    </li>
   </ul>
 </section>

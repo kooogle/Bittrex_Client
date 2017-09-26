@@ -73,6 +73,12 @@ Rails.application.routes.draw do
     resources :chains do
       resources :tickers
     end
+    resources :points do
+      member do
+        get 'change_state'
+      end
+    end
+    resources :orders
   end
 
   namespace :api do

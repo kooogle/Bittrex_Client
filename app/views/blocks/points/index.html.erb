@@ -1,0 +1,103 @@
+<%= content_for(:title,  '事务焦点列表 | BLOCK') %>
+<section class="content-header">
+  <h1>
+    交易焦点 <small>信息预览</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-btc"></i> Dashboard</a></li>
+    <li class="active"><i class="fa fa-btc"></i> 交易焦点</li>
+  </ol>
+</section>
+<section class="content">
+  <div class="box box-primary">
+    <div class="box-header">
+      <a href="<%= new_blocks_point_path %>" class="btn bg-primary btn-flat"><i class="ion-plus"></i> 添加区块</a>
+    </div>
+    <div class="box-body">
+      <div class="row">
+        <div class="col-sm-12">
+          <table id="example1" class="table table-bordered table-striped dataTable" role="grid" aria-describedby="example1_info">
+            <thead>
+            <tr>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">区块</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">权重</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">总量</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">总值</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">单位</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">状态</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center;width: 240px">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% @points.each do |item| %>
+              <tr style="text-align: center">
+                <td>
+                  <label class="btn bg-black btn-flat" style="font-size: 16px">
+                    <i class="fa fa-btc"></i>
+                    <%= item.chain.full_name %>
+                  </label>
+                </td>
+                <td>
+                  <label class="btn bg-black btn-flat" style="font-size: 16px">
+                    <i class="fa fa-hourglass-1"></i>
+                    <%= item.weights %>
+                  </label>
+                </td>
+                <td>
+                  <label class="btn bg-black btn-flat" style="font-size: 16px">
+                    <i class="fa fa-pie-chart"></i>
+                    <%= item.total_amount %>
+                  </label>
+                </td>
+                <td>
+                  <label class="btn bg-black btn-flat" style="font-size: 16px">
+                    <i class="fa fa-cc-mastercard"></i>
+                    <%= item.total_value %>
+                  </label>
+                </td>
+                <td>
+                  <label class="btn bg-black btn-flat" style="font-size: 16px">
+                    <i class="fa fa-star-o"></i>
+                    <%= item.unit %>
+                  </label>
+                </td>
+                <td>
+                  <input type="checkbox" name="my-checkbox" <%= 'checked' if item.state %> onchange='switch_state(<%= item.id %>)'>
+                </td>
+                <td>
+                  <a href="<%= edit_blocks_point_path(item) %>" class="btn bg-orange btn-flat">
+                    <i class="glyphicon glyphicon-edit"></i>
+                    编辑
+                  </a>
+                  <a href="<%= blocks_point_path(item) %>" class="btn bg-red btn-flat" data-method="delete" data-confirm="确定删除事务焦点吗？">
+                    <i class="glyphicon glyphicon-trash"></i>
+                    删除
+                  </a>
+                </td>
+              </tr>
+            <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-5">
+          <div class="dataTables_info" id="example1_info" role="status" aria-live="polite"><h5>总计：「<%= @points.count %>」</h5></div>
+        </div>
+        <div class="col-sm-12">
+          <div class="dataTables_paginate paging_simple_numbers">
+          <%= will_paginate @points, :class=>'apple_pagination' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<% content_for :script_footer do %>
+  <script type="text/javascript">
+    function switch_state(item) {
+      $.get('/blocks/points/' + item +'/change_state');
+    }
+    $("[name='my-checkbox']").bootstrapSwitch({onColor:'success',offColor:'danger'});
+  </script>
+<% end %>

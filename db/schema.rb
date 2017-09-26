@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170925030937) do
+ActiveRecord::Schema.define(version: 20170926075628) do
 
   create_table "chains", force: :cascade do |t|
     t.string   "block",      limit: 255
@@ -19,6 +19,28 @@ ActiveRecord::Schema.define(version: 20170925030937) do
     t.string   "label",      limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.integer  "chain_id",   limit: 4
+    t.integer  "deal",       limit: 4
+    t.float    "amount",     limit: 24
+    t.float    "price",      limit: 24
+    t.float    "total",      limit: 24
+    t.boolean  "state"
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
+
+  create_table "points", force: :cascade do |t|
+    t.integer  "chain_id",     limit: 4
+    t.integer  "weights",      limit: 4
+    t.float    "total_amount", limit: 24
+    t.float    "total_value",  limit: 24
+    t.float    "unit",         limit: 24
+    t.boolean  "state"
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
   end
 
   create_table "tickers", force: :cascade do |t|

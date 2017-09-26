@@ -16,9 +16,9 @@ class Chain < ActiveRecord::Base
   end
 
   def quote
-    yzmb_url = 'https://bittrex.com/api/v1.1/public/getticker'
+    ticker_url = 'https://bittrex.com/api/v1.1/public/getticker'
     res = Faraday.get do |req|
-      req.url yzmb_url
+      req.url ticker_url
       req.params['market'] = "#{self.currency}-#{self.block}"
     end
     current = JSON.parse(res.body)
