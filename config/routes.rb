@@ -79,6 +79,11 @@ Rails.application.routes.draw do
       end
     end
     resources :orders
+    resources :balances do
+      collection do
+        get 'sync'
+      end
+    end
   end
 
   namespace :api do

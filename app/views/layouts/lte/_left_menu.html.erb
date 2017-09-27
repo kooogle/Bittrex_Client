@@ -46,5 +46,10 @@
         <i class="fa fa-random"></i> <span> 交易订单</span>
       </a>
     </li>
+    <li class="treeview <%= 'active' if controller_name == 'balances' %>">
+      <a href="<%= blocks_balances_path %>" target="_self">
+        <i class="fa fa-shopping-cart"></i> <span> 货币余额</span>
+      </a>
+    </li>
   </ul>
 </section>
