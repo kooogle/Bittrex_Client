@@ -4,12 +4,14 @@
 # t.float    "price",      limit: 24
 # t.float    "total",      limit: 24
 # t.boolean  "state"
+# t.string   "result",     limit: 255
 # t.datetime "created_at", null: false
 # t.datetime "updated_at", null: false
 
 class Order < ActiveRecord::Base
   belongs_to :chain, class_name:'Chain', foreign_key:'chain_id'
-  after_save :sync_remote_order, :calculate_total
+  after_create :calculate_total
+  after_save :sync_remote_order
 
   def dealing
     {0=>'SELL',1=>'BUY'}[self.deal]
@@ -41,33 +43,39 @@ class Order < ActiveRecord::Base
       elsif self.sell?
         result = self.remote_sell_order rescue {}
       end
-      return self.update_attributes(state:true) if result['success'] == true
-      self.update_attributes(state:false)
+      return self.update_attributes(state:true, result:result['result']['uuid']) if result['success']
+      self.update_attributes(state:false, result:result['message'])
     end
   end
 
   def remote_buy_order
     buy_url = 'https://bittrex.com/api/v1.1/market/buylimit'
-    res = Faraday.get do |req|
-      req.url buy_url
-      req.params['apikey'] = Settings.bittrex_key
-      req.params['market'] = "#{self.chain.currency}-#{self.chain.block}"
-      req.params['quantity'] = self.amount
-      req.params['rate'] = self.price
-    end
-    res = JSON.parse(res.body)
+    self.remote_order(buy_url)
   end
 
   def remote_sell_order
     sell_url = 'https://bittrex.com/api/v1.1/market/selllimit'
+    self.remote_order(sell_url)
+  end
+
+  def sign_query(timetamp)
+    query_arry = ["apikey=#{Settings.apiKey}","market=#{self.chain.currency}-#{self.chain.block}","nonce=#{timetamp}","quantity=#{self.amount}","rate=#{self.price}"]
+    query_arry.sort.join('&')
+  end
+
+  def remote_order(deal_url)
+    timetamp = Time.now.to_i
+    sign_url = "#{deal_url}?#{self.sign_query(timetamp)}"
     res = Faraday.get do |req|
-      req.url sell_url
-      req.params['apikey'] = Settings.bittrex_key
+      req.url deal_url
+      req.headers['apisign'] = Dashboard.hamc_digest(sign_url)
+      req.params['apikey'] = Settings.apiKey
       req.params['market'] = "#{self.chain.currency}-#{self.chain.block}"
+      req.params['nonce'] = timetamp
       req.params['quantity'] = self.amount
       req.params['rate'] = self.price
     end
-    res = JSON.parse(res.body)
+    result = JSON.parse(res.body)
   end
 
 end

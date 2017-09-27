@@ -36,4 +36,18 @@ class Chain < ActiveRecord::Base
     ticker.save
   end
 
+  def balance
+    balance_url = 'https://bittrex.com/api/v1.1/account/getbalance'
+    timetamp = Time.now.to_i
+    sign_url = "#{balance_url}?apikey=#{Settings.apiKey}&currency=#{self.block}&nonce=#{timetamp}"
+    res = Faraday.get do |req|
+      req.url balance_url
+      req.headers['apisign'] = Dashboard.hamc_digest(sign_url)
+      req.params['apikey'] = Settings.apiKey
+      req.params['currency'] = self.block
+      req.params['nonce'] = timetamp
+    end
+    result = JSON.parse(res.body)['reslut']
+  end
+
 end
