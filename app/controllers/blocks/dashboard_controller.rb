@@ -12,4 +12,20 @@ class Blocks::DashboardController < Blocks::BaseController
     @ma5_array = tickers.map {|x| x.ma_price}
   end
 
+  def pending
+    currency = ['BTC','ETH','USDT']
+    @orders = []
+    Balance.all.each do |item|
+      block = item.block
+      currency.each do |curr|
+        if block != curr && item.balance > 0
+          market = "#{curr}-#{block}"
+          order = Order.pending(market)
+          order['result'].map {|item_order| @orders << item_order } if order['result'].present?
+        end
+      end
+    end
+    @orders
+  end
+
 end

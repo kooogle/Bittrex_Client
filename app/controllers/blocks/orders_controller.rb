@@ -37,6 +37,12 @@ class Blocks::OrdersController < Blocks::BaseController
     redirect_to :back
   end
 
+  def cancel
+    Order.cancel(params[:uuid])
+    flash[:notice] = "买卖挂单取消交易"
+    redirect_to :back
+  end
+
   private
     def set_order
       @order = Order.find(params[:id])

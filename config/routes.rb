@@ -70,6 +70,7 @@ Rails.application.routes.draw do
 
   namespace :blocks do
     get '/', to:'dashboard#index', as: :ticker
+    get 'pending_orders', to: 'dashboard#pending', as: :pending
     resources :chains do
       resources :tickers
     end
@@ -78,7 +79,11 @@ Rails.application.routes.draw do
         get 'change_state'
       end
     end
-    resources :orders
+    resources :orders do
+      collection do
+        get 'cancel'
+      end
+    end
     resources :balances do
       collection do
         get 'sync'

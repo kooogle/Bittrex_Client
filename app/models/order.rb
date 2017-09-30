@@ -78,4 +78,32 @@ class Order < ActiveRecord::Base
     result = JSON.parse(res.body)
   end
 
+  def self.pending(market)
+    timetamp = Time.now.to_i
+    open_order_url = 'https://bittrex.com/api/v1.1/market/getopenorders'
+    sign_url = "#{open_order_url}?apikey=#{Settings.apiKey}&market=#{market}&nonce=#{timetamp}"
+    res = Faraday.get do |req|
+      req.url open_order_url
+      req.headers['apisign'] = Dashboard.hamc_digest(sign_url)
+      req.params['apikey'] = Settings.apiKey
+      req.params['market'] = market
+      req.params['nonce'] = timetamp
+    end
+    result = JSON.parse(res.body)
+  end
+
+  def self.cancel(uuid)
+    timetamp = Time.now.to_i
+    cancel_order_url = 'https://bittrex.com/api/v1.1/market/cancel'
+    sign_url = "#{cancel_order_url}?apikey=#{Settings.apiKey}&nonce=#{timetamp}&uuid=#{uuid}"
+    res = Faraday.get do |req|
+      req.url cancel_order_url
+      req.headers['apisign'] = Dashboard.hamc_digest(sign_url)
+      req.params['apikey'] = Settings.apiKey
+      req.params['uuid'] = uuid
+      req.params['nonce'] = timetamp
+    end
+    result = JSON.parse(res.body)
+  end
+
 end

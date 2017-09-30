@@ -24,6 +24,11 @@
         <i class="fa fa-dashboard"></i> <span> 日常行情</span>
       </a>
     </li>
+    <li class="treeview <%= 'active' if controller_name == 'dashboard' && action_name == 'pending' %>">
+      <a href="<%= blocks_pending_path %>" target="_self">
+        <i class="fa fa-server"></i> <span> 活动挂单</span>
+      </a>
+    </li>
     <li class="treeview <%= 'active' if controller_name == 'chains' %>">
       <a href="<%= blocks_chains_path %>" target="_self">
         <i class="fa fa-btc"></i> <span> 区块货币</span>
