@@ -7,17 +7,23 @@
 # t.datetime "updated_at",  null: false
 
 class Balance < ActiveRecord::Base
+  scope :much, -> { order(balance: :asc)}
+
 
   def self.sync
     balances = Balance.sync_all rescue []
     balances.each do |item|
+      balance = Balance.find_by_block(item['Currency'])
       if item['Balance'] > 0
-        Balance.find_or_create_by(block:item['Currency']) do |balance|
-          balance.balance = item['Balance']
-          balance.available = item['Available']
-          balance.pending = item['Pending']
-          balance.address = item['CryptoAddress']
-        end
+        balance = Balance.new if balance.nil?
+        balance.block = item['Currency']
+        balance.balance = item['Balance']
+        balance.available = item['Available']
+        balance.pending = item['Pending']
+        balance.address = item['CryptoAddress']
+        balance.save
+      elsif balance && item['Balance'] == 0
+        balance.destroy
       end
     end
   end

@@ -2,7 +2,7 @@ class Blocks::BalancesController < Blocks::BaseController
   before_action :set_balance, only:[:edit, :update, :destroy]
 
   def index
-    @balances = Balance.paginate(page:params[:page])
+    @balances = Balance.much.paginate(page:params[:page])
   end
 
   def new
