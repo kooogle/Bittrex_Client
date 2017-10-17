@@ -1,4 +1,4 @@
-<%= content_for(:title,  '每日行情 | Block') %>
+<%= content_for(:title,  'K-Line | Block') %>
 <%= content_for :script do %>
   <%= javascript_include_tag 'chart', 'data-turbolinks-track' => true %>
 <% end %>
@@ -19,7 +19,7 @@
           <select onchange="javascript:location.href = this.value;" class="form-control" style="display: inline;">
             <option value="?">请选择区块链</option>
             <% Chain.named.each do |item|%>
-              <option value="?block=<%= item.id %>&start=<%= params[:start] || Date.current.to_s %>&end=<%= params[:end] || Date.current.to_s %>" <%= 'selected' if params[:block].to_i == item.id %>><%= item.full_name %></option>
+              <option value="?block=<%= item.id %>&start=<%= params[:start] || Date.current.to_s %>&end=<%= params[:end] || Date.current.to_s %>" <%= 'selected' if params[:block].to_i == item.id || (!params[:block].present? && item.id == Chain.named.first.id)%>><%= item.full_name %></option>
             <% end %>
           </select>
         </div>
@@ -65,15 +65,21 @@
         datasets: [
           {
             label: "市价线",
-            data: <%= @value_array %>,
+            data: <%= @value_array.compact %>,
+            fill: true,
+            backgroundColor: 'rgba(63,43,54,0.2)',
+            borderColor: 'rgba(63,43,54, 1)',
+            lineTension: 0.25
+          },{
+            label: "五刻均价线",
+            data: <%= @ma5_array.compact %>,
             fill: false,
             backgroundColor: 'rgba(27,129,62,0.2)',
             borderColor: 'rgba(27,129,62, 1)',
             lineTension: 0.25
-          },
-          {
-            label: "均价线",
-            data: <%= @ma5_array %>,
+          },{
+            label: "十刻均价线",
+            data: <%= @ma10_array.compact %>,
             fill: false,
             backgroundColor: 'rgba(203, 27, 69,0.2)',
             borderColor: 'rgba(203, 27, 69, 1)',
@@ -87,7 +93,7 @@
           display: true,
           fontSize: 18,
           fontColor: 'rgba(246, 81, 29, 1)',
-          text: "<%= @block.full_name %> 每日行情"
+          text: "<%= @block.full_name %> K-Line"
         }
       }
   });

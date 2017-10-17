@@ -25,6 +25,16 @@ class Chain < ActiveRecord::Base
     current['result']
   end
 
+  def market
+    market_url = 'https://bittrex.com/api/v1.1/public/getmarketsummary'
+    res = Faraday.get do |req|
+      req.url market_url
+      req.params['market'] = "#{self.currency}-#{self.block}"
+    end
+    current = JSON.parse(res.body)
+    current['result']
+  end
+
   def generate_ticker
     quote = self.quote
     ticker = Ticker.new
@@ -49,5 +59,22 @@ class Chain < ActiveRecord::Base
     end
     result = JSON.parse(res.body)['reslut']
   end
+
+  def high
+    self.tickers.last(48).map {|x| x.last_price}.max
+  end
+
+  def low
+    self.tickers.last(48).map {|x| x.last_price}.min
+  end
+
+  def high_nearby(price)
+    return true if self.high * 0.99618 < price && self.high * 1.00382 > price
+  end
+
+  def low_nearby(price)
+    return true if self.low * 0.99618 < price && self.low * 1.00382 > price
+  end
+
 
 end

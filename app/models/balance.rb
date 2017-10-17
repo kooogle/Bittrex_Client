@@ -1,14 +1,13 @@
 # t.string   "block",      limit: 255
-# t.float    "balance",    limit: 24
-# t.float    "available",  limit: 24
-# t.float    "pending",    limit: 24
+# t.string   "balance",    limit: 24
+# t.string   "available",  limit: 24
+# t.string   "pending",    limit: 24
 # t.string   "address",    limit: 255
 # t.datetime "created_at",  null: false
 # t.datetime "updated_at",  null: false
 
 class Balance < ActiveRecord::Base
   scope :much, -> { order(balance: :asc)}
-
 
   def self.sync
     balances = Balance.sync_all rescue []

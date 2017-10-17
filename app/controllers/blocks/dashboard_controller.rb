@@ -9,7 +9,8 @@ class Blocks::DashboardController < Blocks::BaseController
     tickers = @block.tickers.last(24) if tickers.count < 10
     @date_array = tickers.map {|x| x.created_at.strftime('%m-%d %H:%M')}
     @value_array = tickers.map {|x| x.last_price}
-    @ma5_array = tickers.map {|x| x.ma_price}
+    @ma5_array = tickers.map {|x| x.ma5_price}
+    @ma10_array = tickers.map {|x| x.ma10_price}
   end
 
   def pending

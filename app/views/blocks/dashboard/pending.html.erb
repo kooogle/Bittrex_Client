@@ -18,9 +18,10 @@
             <tr>
               <th tabindex="0" aria-controls="example1" style="text-align: center">市场</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">类型</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">待售</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">数量</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">单价</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">剩余</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">价值</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center;width: 240px">操作</th>
             </tr>
             </thead>
@@ -29,12 +30,13 @@
               <tr style="text-align: center">
                 <td><%= item['Exchange'] %></td>
                 <td><%= item['OrderType'] %></td>
+                <td><%= item['QuantityRemaining'] %></td>
                 <td><%= item['Quantity'] %></td>
                 <td><%= item['Limit'] %></td>
-                <td><%= item['QuantityRemaining'] %></td>
+                <td><%= (item['Limit'] * item['Quantity'] * 0.9975).round(2) %></td>
                 <td>
-                  <a href="<%= cancel_blocks_orders_path(uuid:item['OrderUuid']) %>" class="btn bg-orange btn-flat">
-                    <i class="glyphicon glyphicon-edit"></i>
+                  <a href="<%= cancel_blocks_orders_path(uuid:item['OrderUuid']) %>" class="btn bg-aqua btn-flat">
+                    <i class="fa fa-shower"></i>
                     撤单
                   </a>
                 </td>
