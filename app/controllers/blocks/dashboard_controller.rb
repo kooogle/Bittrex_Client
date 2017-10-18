@@ -19,7 +19,7 @@ class Blocks::DashboardController < Blocks::BaseController
     Balance.all.each do |item|
       block = item.block
       currency.each do |curr|
-        if block != curr && item.balance > 0
+        if block != curr && item.balance.to_f > 0
           market = "#{curr}-#{block}"
           order = Order.pending(market)
           order['result'].map {|item_order| @orders << item_order } if order['result'].present?
