@@ -9,7 +9,8 @@ class Api::QuotesController < ApplicationController
   #每10分钟获取一次最新价格，根据价格涨幅做买卖通知
   def hit_market
     Chain.all.each do |item|
-      quote_analysis(item) rescue nil
+      # quote_analysis(item) rescue nil
+      quote_report(item) rescue nil
     end
     render json:{code:200}
   end
@@ -18,6 +19,16 @@ private
 
   def amplitude(old_price,new_price)
     return ((new_price - old_price) / old_price * 100).to_i
+  end
+
+  def quote_report(market)
+    market = block.market
+    if block.high_nearby(market['Bid'])
+      string = "#{self.currency}-#{self.block} 接近最高价，买一价：#{market['Bid']}"
+    elsif block.low_nearby(market['Ask'])
+      string = "#{self.currency}-#{self.block} 接近最低价，买一价：#{market['Ask']}"
+    end
+    User.sms_yunpian(string)
   end
 
   def quote_analysis(block)
