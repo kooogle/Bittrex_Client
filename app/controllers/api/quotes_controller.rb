@@ -7,9 +7,9 @@ class Api::QuotesController < ApplicationController
     render json:{code:200}
   end
   #每10分钟获取一次最新价格，根据价格涨幅做买卖通知
-  def hit_market
+  def hit_markets
     Chain.all.each do |item|
-      # quote_analysis(item) rescue nil
+      quote_analysis(item) rescue nil
       quote_report(item) rescue nil
     end
     render json:{code:200}
@@ -23,9 +23,9 @@ private
 
   def quote_report(market)
     market = block.market
-    if block.high_nearby(market['Bid'])
+    if block.high_nearby(market['Bid']) || market['Bid'] > block.high
       string = "#{self.currency}-#{self.block} 接近最高价，买一价：#{market['Bid']}"
-    elsif block.low_nearby(market['Ask'])
+    elsif block.low_nearby(market['Ask']) || market['Ask'] < block.low
       string = "#{self.currency}-#{self.block} 接近最低价，买一价：#{market['Ask']}"
     end
     User.sms_yunpian(string)
@@ -44,11 +44,43 @@ private
 
   def buy_analysis(block,market)
     last_price = market['Ask']
+    point = block.point
+    currency = block.money
+    if block.low_nearby(last_price)
+      buy_chain(block,point.unit,last_price) if currency > point.unit * last_price
+    elsif block.kling_down_up_point?
+      buy_chain(block,point.unit,last_price) if currency > point.unit * last_price
+    end
   end
 
   def sell_analysis(block,market)
     last_price = market['Bid']
-    quote12 = block.tickers.last(12).map {|x| x.last_price }
+    point = block.point
+    balance = block.balance
+    elsif block.high_nearby(last_price)
+      sell_chain(block,point.unit,last_price) if balance > point.unit
+    elsif block.kling_up_down_point?
+      sell_chain(block,point.unit,last_price) if balance > point.unit
+    end
   end
+
+  def sell_chain(block,amount,price)
+    order = Order.new
+    order.deal = 0
+    order.chain_id = block.id
+    order.amount = amount
+    order.price = price
+    order.save
+  end
+
+  def buy_chain(block,amount,price)
+    order = Order.new
+    order.deal = 1
+    order.chain_id = block.id
+    order.amount = amount
+    order.price = price
+    order.save
+  end
+
 
 end

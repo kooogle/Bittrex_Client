@@ -10,6 +10,8 @@ class Chain < ActiveRecord::Base
   validates_uniqueness_of :block, scope: :currency
   self.per_page = 10
   has_many :tickers, dependent: :destroy
+  has_one :point, class_name:'Point'
+  has_one :wallet, class_name:'Balance', primary_key:'block', foreign_key:'block'
 
   def full_name
     "#{self.currency}-#{self.block}"
@@ -57,7 +59,17 @@ class Chain < ActiveRecord::Base
       req.params['currency'] = self.block
       req.params['nonce'] = timetamp
     end
-    result = JSON.parse(res.body)['reslut']
+    result = JSON.parse(res.body)
+    result['result']['Available']
+  end
+
+  def money
+    balances = Balance.sync_all
+    balances.each do |balance|
+      if balance['Currency'] == self.currency.to_s
+        return balance['Available']
+      end
+    end
   end
 
   def high
@@ -69,11 +81,35 @@ class Chain < ActiveRecord::Base
   end
 
   def high_nearby(price)
-    return true if self.high * 0.99618 < price && self.high * 1.00382 > price
+    return true if self.high * 0.99382 < price && self.high > price
   end
 
   def low_nearby(price)
-    return true if self.low * 0.99618 < price && self.low * 1.00382 > price
+    return true if self.low > price && self.low * 1.00618< price
+  end
+
+  def ma_up_down_point?
+    ma_gap = self.tickers.last(5).map {|x| (x.ma5_price - x.ma10_price).round(8)}
+    return true if ma_gap.min > 0 && ma_gap.max == ma_gap[-2]
+    false
+  end
+
+  def ma_down_up_point?
+    ma_gap = self.tickers.last(5).map {|x| (x.ma5_price - x.ma10_price).round(8)}
+    return true if ma_gap.max < 0 && ma_gap.min == ma_gap[-2]
+    false
+  end
+
+  def kling_up_down_point?
+    ling = self.tickers.last(24).map {|x| x.last_price}
+    return true if ling.max == [-2]
+    false
+  end
+
+  def kling_down_up_point?
+    ling = self.tickers.last(24).map {|x| x.last_price}
+    return true if ling.min == [-2]
+    false
   end
 
 
