@@ -9,7 +9,7 @@ class Api::QuotesController < ApplicationController
   #每10分钟获取一次最新价格，根据价格涨幅做买卖通知
   def hit_markets
     Chain.all.each do |item|
-      quote_analysis(item) rescue nil
+      quote_analysis(item) if item.point.try(:state)
     end
     render json:{code:200}
   end

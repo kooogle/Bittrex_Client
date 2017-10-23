@@ -85,7 +85,7 @@ class Chain < ActiveRecord::Base
   end
 
   def low_nearby(price)
-    return true if self.low > price && self.low * 1.00618< price
+    return true if self.low < price && self.low * 1.00618 > price
   end
 
   def ma_up_down_point?
@@ -109,6 +109,20 @@ class Chain < ActiveRecord::Base
   def kling_down_up_point?
     ling = self.tickers.last(24).map {|x| x.last_price}
     return true if ling.min == [-2]
+    false
+  end
+
+  def market_rise?
+    last_1_day_max = self.tickers.where(mark:(Date.current - 1.day).to_s).map {|x| x.last_price}.max
+    last_2_day_max = self.tickers.where(mark:(Date.current - 2.day).to_s).map {|x| x.last_price}.max
+    return true if last_1_day_max > last_2_day_max
+    false
+  end
+
+  def market_fall?
+    last_1_day_min = self.tickers.where(mark:(Date.current - 1.day).to_s).map {|x| x.last_price}.min
+    last_2_day_min = self.tickers.where(mark:(Date.current - 2.day).to_s).map {|x| x.last_price}.min
+    return true if last_1_day_min < last_2_day_min
     false
   end
 
