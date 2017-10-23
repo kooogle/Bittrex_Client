@@ -10,7 +10,6 @@ class Api::QuotesController < ApplicationController
   def hit_markets
     Chain.all.each do |item|
       quote_analysis(item) rescue nil
-      quote_report(item) rescue nil
     end
     render json:{code:200}
   end
@@ -57,7 +56,7 @@ private
     last_price = market['Bid']
     point = block.point
     balance = block.balance
-    elsif block.high_nearby(last_price)
+    if block.high_nearby(last_price)
       sell_chain(block,point.unit,last_price) if balance > point.unit
     elsif block.kling_up_down_point?
       sell_chain(block,point.unit,last_price) if balance > point.unit
@@ -81,6 +80,5 @@ private
     order.price = price
     order.save
   end
-
 
 end
