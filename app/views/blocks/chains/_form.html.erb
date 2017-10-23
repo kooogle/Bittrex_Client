@@ -17,7 +17,7 @@
         <div class="input-group-addon">
           <i class="fa fa-money"></i>
         </div>
-        <%= f.text_field :currency, class:'form-control', placeholder:'（必填* 区块链交易货币）' %>
+        <%= f.select(:currency, [['美元','USDT'],['比特币','BTC'],['以太币','ETH']], {prompt:'请选择货币'},{:class => 'form-control'}) %>
       </div>
       <%= model_errors(@chain,'currency') %>
     </div>
