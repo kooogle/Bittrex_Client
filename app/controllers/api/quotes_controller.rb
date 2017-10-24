@@ -36,13 +36,13 @@ private
     ma10_price = block.tickers.last.ma10_price
     if ma5_price > ma10_price
       sell_analysis(block,market)
-    elsif ma5_price < ma10_price
+    elsif ma5_price < ma10_price && block.market_rise?
       buy_analysis(block,market)
     end
   end
 
   def buy_analysis(block,market)
-    last_price = market['Ask']
+    last_price = market.first['Ask']
     point = block.point
     currency = block.money
     if block.low_nearby(last_price)
@@ -53,7 +53,7 @@ private
   end
 
   def sell_analysis(block,market)
-    last_price = market['Bid']
+    last_price = market.first['Bid']
     point = block.point
     balance = block.balance
     if block.high_nearby(last_price)
