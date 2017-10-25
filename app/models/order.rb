@@ -13,6 +13,8 @@ class Order < ActiveRecord::Base
   after_create :calculate_total
   after_save :sync_remote_order
 
+  self.per_page = 10
+
   def dealing
     {0=>'SELL',1=>'BUY'}[self.deal]
   end
@@ -59,7 +61,7 @@ class Order < ActiveRecord::Base
   end
 
   def sign_query(timetamp)
-    query_arry = ["apikey=#{Settings.apiKey}","market=#{self.chain.currency}-#{self.chain.block}","nonce=#{timetamp}","quantity=#{self.amount}","rate=#{self.price}"]
+    query_arry = ["apikey=#{Settings.apiKey}","market=#{self.chain.markets}","nonce=#{timetamp}","quantity=#{self.amount}","rate=#{self.price}"]
     query_arry.sort.join('&')
   end
 
@@ -70,7 +72,7 @@ class Order < ActiveRecord::Base
       req.url deal_url
       req.headers['apisign'] = Dashboard.hamc_digest(sign_url)
       req.params['apikey'] = Settings.apiKey
-      req.params['market'] = "#{self.chain.currency}-#{self.chain.block}"
+      req.params['market'] = self.chain.markets
       req.params['nonce'] = timetamp
       req.params['quantity'] = self.amount
       req.params['rate'] = self.price

@@ -14,6 +14,10 @@ class Chain < ActiveRecord::Base
   has_one :wallet, class_name:'Balance', primary_key:'block', foreign_key:'block'
 
   def full_name
+    "#{self.block}-#{self.currency}"
+  end
+
+  def markets
     "#{self.currency}-#{self.block}"
   end
 
@@ -21,7 +25,7 @@ class Chain < ActiveRecord::Base
     ticker_url = 'https://bittrex.com/api/v1.1/public/getticker'
     res = Faraday.get do |req|
       req.url ticker_url
-      req.params['market'] = "#{self.currency}-#{self.block}"
+      req.params['market'] = self.markets
     end
     current = JSON.parse(res.body)
     current['result']
@@ -31,7 +35,7 @@ class Chain < ActiveRecord::Base
     market_url = 'https://bittrex.com/api/v1.1/public/getmarketsummary'
     res = Faraday.get do |req|
       req.url market_url
-      req.params['market'] = "#{self.currency}-#{self.block}"
+      req.params['market'] = self.markets
     end
     current = JSON.parse(res.body)
     current['result']
@@ -82,10 +86,12 @@ class Chain < ActiveRecord::Base
 
   def high_nearby(price)
     return true if self.high * 0.99382 < price && self.high > price
+    false
   end
 
   def low_nearby(price)
     return true if self.low < price && self.low * 1.00618 > price
+    false
   end
 
   def ma_up_down_point?
