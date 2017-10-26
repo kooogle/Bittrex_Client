@@ -43,9 +43,13 @@ private
 
   def buy_analysis(block,market)
     last_price = market.first['Ask']
+    low_price = market.first['Low']
     point = block.point
     currency = block.money
-    if block.low_nearby(last_price)
+    if last_price < block.low && last_price > low_price
+      money = block.available_money
+      buy_chain(block,money / last_price ,last_price) if money > 0
+    elsif block.low_nearby(last_price)
       buy_chain(block,point.unit,last_price) if currency > point.unit * last_price
     elsif block.kling_down_up_point?
       buy_chain(block,point.unit,last_price) if currency > point.unit * last_price
@@ -54,9 +58,12 @@ private
 
   def sell_analysis(block,market)
     last_price = market.first['Bid']
+    high_price = market.first['High']
     point = block.point
     balance = block.balance
-    if block.high_nearby(last_price)
+    if last_price > block.high && last_price < high_price
+      sell_chain(block,balance,last_price) if balance > 0
+    elsif block.high_nearby(last_price)
       sell_chain(block,point.unit,last_price) if balance > point.unit
     elsif block.kling_up_down_point?
       sell_chain(block,point.unit,last_price) if balance > point.unit

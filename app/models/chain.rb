@@ -132,5 +132,12 @@ class Chain < ActiveRecord::Base
     false
   end
 
+  def available_money
+    max_buy = self.point.total_value
+    money = self.money
+    return max_buy if money > max_buy
+    money
+  end
+
 
 end
