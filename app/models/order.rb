@@ -16,11 +16,11 @@ class Order < ActiveRecord::Base
   self.per_page = 10
 
   def self.total_buy
-    Order.where(deal:1).where(state:true).map {|x| x.total}.sum
+    Order.where(deal:1).where(state:true).map {|x| x.total}.sum.round(2)
   end
 
   def self.total_sell
-    Order.where(deal:0).where(state:true).map {|x| x.total}.sum
+    Order.where(deal:0).where(state:true).map {|x| x.total}.sum.round(2)
   end
 
   def dealing
