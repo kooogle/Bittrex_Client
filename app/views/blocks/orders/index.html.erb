@@ -11,7 +11,10 @@
 <section class="content">
   <div class="box box-primary">
     <div class="box-header">
-      <a href="<%= new_blocks_order_path %>" class="btn bg-primary btn-flat"><i class="ion-plus"></i> 添加挂单</a>
+      <span>卖出：「<%= Order.total_sell %>」</span>
+      <span>买入：「<%= Order.total_buy %>」</span>
+      <span>收益：「<%= Order.total_sell - Order.total_buy %>」</span>
+      <a href="<%= new_blocks_order_path %>" class="btn bg-primary btn-flat" style="float: right;"><i class="ion-plus"></i> 添加挂单</a>
     </div>
     <div class="box-body">
       <div class="row">
@@ -55,7 +58,9 @@
       </div>
       <div class="row">
         <div class="col-sm-5">
-          <div class="dataTables_info" id="example1_info" role="status" aria-live="polite"><h5>总计：「<%= @orders.count %>」</h5></div>
+          <div class="dataTables_info" id="example1_info" role="status" aria-live="polite">
+            <span>条目：「<%= @orders.count %>」</span>
+          </div>
         </div>
         <div class="col-sm-12">
           <div class="dataTables_paginate paging_simple_numbers">
