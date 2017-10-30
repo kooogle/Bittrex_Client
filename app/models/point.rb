@@ -4,6 +4,7 @@
 # t.float    "total_value",  limit: 24
 # t.float    "unit",         limit: 24
 # t.boolean  "state"
+# t.float    "income",       limit: 24
 # t.datetime "created_at",   null: false
 # t.datetime "updated_at",   null: false
 

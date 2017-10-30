@@ -10,6 +10,7 @@ class Chain < ActiveRecord::Base
   validates_uniqueness_of :block, scope: :currency
   self.per_page = 10
   has_many :tickers, dependent: :destroy
+  has_many :business, class_name:'Order'
   has_one :point, class_name:'Point'
   has_one :wallet, class_name:'Balance', primary_key:'block', foreign_key:'block'
 
@@ -74,6 +75,17 @@ class Chain < ActiveRecord::Base
         return balance['Available']
       end
     end
+  end
+
+  def greater_income
+    self.last_buy_price + self.point.income
+  end
+
+  def last_buy_price
+    if buy = self.business.where(deal:1,state:true).last
+      return buy.price
+    end
+    0
   end
 
   def high

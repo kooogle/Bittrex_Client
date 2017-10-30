@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171017102906) do
+ActiveRecord::Schema.define(version: 20171030023008) do
 
   create_table "balances", force: :cascade do |t|
     t.string   "block",      limit: 255
@@ -52,6 +52,7 @@ ActiveRecord::Schema.define(version: 20171017102906) do
     t.boolean  "state"
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
+    t.float    "income",       limit: 24
   end
 
   create_table "tickers", force: :cascade do |t|

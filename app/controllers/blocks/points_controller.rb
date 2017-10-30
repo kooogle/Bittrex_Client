@@ -54,6 +54,6 @@ class Blocks::PointsController < Blocks::BaseController
     end
 
     def point_params
-      params.require(:point).permit(:chain_id,:weights,:total_amount,:total_value,:unit,:state)
+      params.require(:point).permit(:chain_id,:weights,:total_amount,:total_value,:unit,:state,:income)
     end
 end

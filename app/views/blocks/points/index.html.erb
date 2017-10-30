@@ -21,9 +21,8 @@
             <tr>
               <th tabindex="0" aria-controls="example1" style="text-align: center">区块</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">权重</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">总量</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">总值</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">单位</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">收益</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">状态</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center;width: 240px">操作</th>
             </tr>
@@ -45,20 +44,14 @@
                 </td>
                 <td>
                   <label class="btn bg-black btn-flat" style="font-size: 16px">
-                    <i class="fa fa-pie-chart"></i>
-                    <%= item.total_amount %>
-                  </label>
-                </td>
-                <td>
-                  <label class="btn bg-black btn-flat" style="font-size: 16px">
-                    <i class="fa fa-cc-mastercard"></i>
-                    <%= item.total_value %>
-                  </label>
-                </td>
-                <td>
-                  <label class="btn bg-black btn-flat" style="font-size: 16px">
-                    <i class="fa fa-star-o"></i>
+                    <i class="fa fa-cc-amex"></i>
                     <%= item.unit %>
+                  </label>
+                </td>
+                <td>
+                  <label class="btn bg-black btn-flat" style="font-size: 16px">
+                    <i class="fa fa-cc-jcb"></i>
+                    <%= item.income %>
                   </label>
                 </td>
                 <td>

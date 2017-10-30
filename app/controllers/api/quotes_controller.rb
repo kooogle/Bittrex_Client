@@ -48,11 +48,22 @@ private
     currency = block.money
     if last_price < block.low && last_price > low_price
       money = block.available_money
-      buy_chain(block,money / last_price ,last_price) if money > 0
+      if money > 0
+        amount = (money/last_price).to_d.round(2,:truncate).to_f
+        buy_chain(block,amount,last_price)
+      end
     elsif block.low_nearby(last_price)
       buy_chain(block,point.unit,last_price) if currency > point.unit * last_price
+      if currency < point.unit * last_price
+        amount = (currency/last_price).to_d.round(2,:truncate).to_f
+        buy_chain(block,amount,last_price)
+      end
     elsif block.kling_down_up_point?
       buy_chain(block,point.unit,last_price) if currency > point.unit * last_price
+      if currency < point.unit * last_price
+        amount = (currency/last_price).to_d.round(2,:truncate).to_f
+        buy_chain(block,amount,last_price)
+      end
     end
   end
 
@@ -61,12 +72,20 @@ private
     high_price = market.first['High']
     point = block.point
     balance = block.balance
-    if last_price > block.high && last_price < high_price
-      sell_chain(block,balance,last_price) if balance > 0
-    elsif block.high_nearby(last_price)
-      sell_chain(block,point.unit,last_price) if balance > point.unit
-    elsif block.kling_up_down_point?
-      sell_chain(block,point.unit,last_price) if balance > point.unit
+    if last_price > block.greater_income && balance > 0
+      if last_price > block.high && last_price < high_price
+        sell_chain(block,balance,last_price)
+      elsif block.high_nearby(last_price)
+        sell_chain(block,point.unit,last_price) if balance > point.unit
+        sell_chain(block,balance,last_price) if balance < point.unit
+      elsif block.kling_up_down_point?
+        sell_chain(block,point.unit,last_price) if balance > point.unit
+        sell_chain(block,balance,last_price) if balance < point.unit
+      end
+    elsif last_price < block.last_buy_price * 0.9382 && balance > 0
+      sell_chain(block,balance,last_price)
+      point.update_attributes(state:false)
+      User.sms_yunpian("#{block.full_name},价格过低,已停止交易!")
     end
   end
 
