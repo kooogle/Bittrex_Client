@@ -36,7 +36,7 @@ private
     ma10_price = block.tickers.last.ma10_price
     if ma5_price > ma10_price
       sell_analysis(block,market)
-    elsif ma5_price < ma10_price && block.market_rise?
+    elsif ma5_price < ma10_price
       buy_analysis(block,market)
     end
   end
