@@ -82,8 +82,10 @@ class Chain < ActiveRecord::Base
   end
 
   def last_buy_price
-    if buy = self.business.where(deal:1,state:true).last
-      return buy.price
+    if buy = self.business.where(deal:1,state:true).last(10)
+      buy_array = buy.map {|x| x.price }
+      buy_average = buy_array.sum / buy_array.size
+      return buy_average
     end
     0
   end
@@ -140,7 +142,7 @@ class Chain < ActiveRecord::Base
   def market_fall?
     last_1_day_min = self.tickers.where(mark:(Date.current - 1.day).to_s).map {|x| x.last_price}.min
     last_2_day_min = self.tickers.where(mark:(Date.current - 2.day).to_s).map {|x| x.last_price}.min
-    return true if last_1_day_min < last_2_day_min
+    return true if last_2_day_min > last_1_day_min
     false
   end
 
