@@ -94,6 +94,11 @@ Rails.application.routes.draw do
   namespace :api do
     get 'hit_tickers', to:'quotes#hit_tickers'
     get 'hit_markets', to:'quotes#hit_markets'
+    resources :stocks do
+      collection do
+        get 'quote'
+      end
+    end
   end
 
 end
