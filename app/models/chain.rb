@@ -43,12 +43,11 @@ class Chain < ActiveRecord::Base
   end
 
   def generate_ticker
-    quote = self.quote
+    quote = self.market.first
     ticker = Ticker.new
     ticker.chain_id = self.id
     ticker.last_price = quote['Last']
-    ticker.buy_price = quote['Bid']
-    ticker.sell_price = quote['Ask']
+    ticker.volume = quote['Volume']
     ticker.mark = Date.current.to_s
     ticker.save
   end
