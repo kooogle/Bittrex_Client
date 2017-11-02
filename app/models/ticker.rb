@@ -1,10 +1,9 @@
 # t.integer  "chain_id",   limit: 4
 # t.float    "last_price", limit: 24
-# t.float    "buy_price",  limit: 24
-# t.float    "sell_price", limit: 24
 # t.float    "ma5_price",  limit: 24
 # t.float    "ma10_price",  limit: 24
 # t.date     "mark"
+# t.float    "volume",     limit: 24
 # t.datetime "created_at",            null: false
 # t.datetime "updated_at",            null: false
 

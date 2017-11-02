@@ -8,10 +8,11 @@ class Api::StocksController < ApplicationController
     render json:{title: chain.label, market:chain.full_name,
       avg_price:avg_price(tickers.map{|x| x.last_price}),
       time: tickers.map{|x| x.created_at.strftime('%H:%M')},
-      price:tickers.map{|x| x.last_price},
-      ma5_price:tickers.map{|x| x.ma5_price},
-      ma10_price:tickers.map{|x| x.ma10_price},
-      col_color: columnar_color(tickers.map{|x| x.last_price})
+      price: tickers.map{|x| x.last_price},
+      ma5_price: tickers.map{|x| x.ma5_price},
+      ma10_price: tickers.map{|x| x.ma10_price},
+      volume: tickers.map{|x| x.volume },
+      col_color: columnar_color(tickers.map{|x| x.volume})
     }
   end
 
@@ -27,7 +28,9 @@ class Api::StocksController < ApplicationController
     end
 
     def avg_price(price_array)
-      (price_array.max + price_array.min) / 2
+      avg = (price_array.max + price_array.min) / 2
+      return avg.round(2) if avg > 1
+      return avg
     end
 
 end
