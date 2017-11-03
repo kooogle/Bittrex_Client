@@ -97,6 +97,7 @@ Rails.application.routes.draw do
     resources :stocks do
       collection do
         get 'quote'
+        get 'init'
       end
     end
   end

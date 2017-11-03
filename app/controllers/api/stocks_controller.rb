@@ -5,7 +5,25 @@ class Api::StocksController < ApplicationController
     amount = params[:amount] || 24
     chain = Chain.find(block)
     tickers = chain.tickers.last(amount.to_i)
-    render json:{title: chain.label, market:chain.full_name,
+    render json:{
+      avg_price:avg_price(tickers.map{|x| x.last_price}),
+      time: tickers.map{|x| x.created_at.strftime('%H:%M')},
+      price: tickers.map{|x| x.last_price},
+      ma5_price: tickers.map{|x| x.ma5_price},
+      ma10_price: tickers.map{|x| x.ma10_price},
+      volume: tickers.map{|x| x.volume },
+      col_color: columnar_color(tickers.map{|x| x.volume})
+    }
+  end
+
+  def init
+    chains = Chain.all
+    chain = Chain.first
+    tickers = chain.tickers.last(48)
+    render json:{
+      block_ids: chains.map{|x| x.id},
+      blocks: chains.map{|x| x.label},
+      markets: chains.map{|x| x.full_name},
       avg_price:avg_price(tickers.map{|x| x.last_price}),
       time: tickers.map{|x| x.created_at.strftime('%H:%M')},
       price: tickers.map{|x| x.last_price},
