@@ -82,9 +82,7 @@ private
         sell_chain(block,point.unit,last_price) if balance > point.unit
         sell_chain(block,balance,last_price) if balance < point.unit
       end
-    elsif last_price < block.last_buy_price * 0.9382 && balance > 0
-      sell_chain(block,balance,last_price)
-      point.update_attributes(state:false)
+    elsif last_price < block.last_buy_price * 0.9382
       User.sms_yunpian("#{block.full_name},价格过低,已停止交易!")
     end
   end
