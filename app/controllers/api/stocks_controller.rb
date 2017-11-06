@@ -37,7 +37,7 @@ class Api::StocksController < ApplicationController
   def balance
     balances = Balance.sync_all
     render json:{
-      balances: balances.map {|x| {title:x['Currency'],amount:x['Balance'],address:x['CryptoAddress']} if x['Balance'] > 0}
+      balances: balances.map {|x| {title:x['Currency'],amount:x['Balance'],address:x['CryptoAddress']} if x['Balance'] > 0}.compact!
     }
   end
 
