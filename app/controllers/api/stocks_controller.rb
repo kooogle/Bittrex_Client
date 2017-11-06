@@ -34,6 +34,13 @@ class Api::StocksController < ApplicationController
     }
   end
 
+  def balance
+    balances = Balance.sync_all
+    render json:{
+      balances: balances.map {|x| {title:x['Currency'],amount:x['Balance'],address:x['CryptoAddress']} if x['Balance'] > 0}
+    }
+  end
+
   private
     def columnar_color(quote_array)
       flag = 0

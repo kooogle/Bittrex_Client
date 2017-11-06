@@ -98,6 +98,7 @@ Rails.application.routes.draw do
       collection do
         get 'quote'
         get 'init'
+        get 'balance'
       end
     end
   end
