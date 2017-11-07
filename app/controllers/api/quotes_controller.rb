@@ -48,15 +48,15 @@ private
     low_price = market.first['Low']
     point = block.point
     currency = block.money
-    if last_price < block.low && last_price > low_price
-      money = block.available_money
-      if money > 0
-        amount = (money/last_price).to_d.round(2,:truncate).to_f
-        buy_chain(block,amount,last_price) if amount > 0
-      end
+    money = block.available_money
+    if last_price < block.low && last_price > low_price && money > 0
+      amount = (money/last_price).to_d.round(2,:truncate).to_f
+      buy_chain(block,amount,last_price) if amount > 0
     elsif block.low_nearby(last_price)
-      buy_chain(block,point.unit,last_price) if currency > point.unit * last_price
-      if currency < point.unit * last_price
+      if money > point.unit * last_price
+        amount = (money/last_price).to_d.round(2,:truncate).to_f
+        buy_chain(block,point.unit,last_price) if amount > 0
+      elsif currency < point.unit * last_price
         amount = (currency/last_price).to_d.round(2,:truncate).to_f
         buy_chain(block,amount,last_price) if amount > 0
       end
