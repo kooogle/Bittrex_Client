@@ -28,7 +28,7 @@
               <th tabindex="0" aria-controls="example1" style="text-align: center">单价</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">总计</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">状态</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center;width: 240px">操作</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center;width: 120px">操作</th>
             </tr>
             </thead>
             <tbody>
@@ -39,15 +39,13 @@
                 <td><%= item.amount %></td>
                 <td><%= item.price %></td>
                 <td><%= item.total %></td>
-                <td><%= item.stating %></td>
+                <td><%= item.stating %><br><%= time_ago_in_words item.updated_at %></td>
                 <td>
                   <a href="<%= edit_blocks_order_path(item) %>" class="btn bg-orange btn-flat">
                     <i class="glyphicon glyphicon-edit"></i>
-                    编辑
                   </a>
                   <a href="<%= blocks_order_path(item) %>" class="btn bg-red btn-flat" data-method="delete" data-confirm="确定删除挂单信息吗？">
                     <i class="glyphicon glyphicon-trash"></i>
-                    删除
                   </a>
                 </td>
               </tr>

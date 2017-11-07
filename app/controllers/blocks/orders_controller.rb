@@ -2,7 +2,7 @@ class Blocks::OrdersController < Blocks::BaseController
   before_action :set_order, only:[:edit, :update, :destroy]
 
   def index
-    @orders = Order.paginate(page:params[:page])
+    @orders = Order.latest.paginate(page:params[:page])
   end
 
   def new

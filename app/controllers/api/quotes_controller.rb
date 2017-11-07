@@ -9,7 +9,9 @@ class Api::QuotesController < ApplicationController
   #每10分钟获取一次最新价格，根据价格涨幅做买卖通知
   def hit_markets
     Chain.all.each do |item|
-      quote_analysis(item) if item.point.try(:state)
+      if item.point && item.point.state
+        quote_analysis(item)
+      end
     end
     render json:{code:200}
   end
@@ -50,7 +52,7 @@ private
       money = block.available_money
       if money > 0
         amount = (money/last_price).to_d.round(2,:truncate).to_f
-        buy_chain(block,amount,last_price)
+        buy_chain(block,amount,last_price) if amount > 0
       end
     elsif block.low_nearby(last_price)
       buy_chain(block,point.unit,last_price) if currency > point.unit * last_price
