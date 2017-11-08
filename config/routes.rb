@@ -101,6 +101,11 @@ Rails.application.routes.draw do
         get 'balance'
       end
     end
+    resources :wechats do
+      collection do
+        get 'auth'
+      end
+    end
   end
 
 end
