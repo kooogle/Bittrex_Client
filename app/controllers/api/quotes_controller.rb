@@ -76,17 +76,20 @@ private
     balance = block.balance
     if last_price > block.greater_income && balance > 0
       if last_price > block.high && last_price < high_price
-        sell_chain(block,balance,last_price)
+        batch_part_sell(block,point.unit,balance,last_price,0.3)
       elsif block.high_nearby(last_price)
-        sell_chain(block,(balance * 0.618).round(2),last_price) if balance > point.unit
-        sell_chain(block,balance,last_price) if balance < point.unit
+        batch_part_sell(block,point.unit,balance,last_price,0.25)
       elsif block.kling_up_down_point?
-        sell_chain(block,(balance * 0.618).round(2),last_price) if balance > point.unit
-        sell_chain(block,balance,last_price) if balance < point.unit
+        batch_part_sell(block,point.unit,balance,last_price,0.2)
       end
     elsif last_price < block.last_buy_price * 0.9382
       User.sms_yunpian("#{block.full_name},价格过低,请留意行情!")
     end
+  end
+
+  def batch_part_sell(block,amount,balance,price,percent)
+    sell_chain(block,(balance * percent).round(2),price) if balance > amount
+    sell_chain(block,amount,price) if balance < amount
   end
 
   def sell_chain(block,amount,price)

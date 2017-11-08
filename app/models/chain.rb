@@ -81,7 +81,7 @@ class Chain < ActiveRecord::Base
   end
 
   def last_buy_price
-    if buy = self.business.where(deal:1,state:true).last(10)
+    if buy = self.business.where(deal:1,state:true).last(5)
       buy_array = buy.map {|x| x.price }
       buy_average = buy_array.sum / buy_array.size
       return buy_average.to_i if buy_average.to_i > 0
