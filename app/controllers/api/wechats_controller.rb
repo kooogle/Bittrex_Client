@@ -1,7 +1,7 @@
 class Api::WechatsController < ApplicationController
 
   def auth
-    render json:{echostr:params[:echostr]}
+    render text:params[:echostr]
   end
 
 end
