@@ -88,8 +88,9 @@ private
   end
 
   def batch_part_sell(block,amount,balance,price,percent)
-    sell_chain(block,(balance * percent).round(2),price) if balance > amount
-    sell_chain(block,amount,price) if balance < amount
+    sell_chain(block,(balance * percent).round(2),price) if (balance * percent).round(2) > amount
+    sell_chain(block,amount,price) if (balance * percent).round(2) < amount && amount < balance
+    sell_chain(block,balance,price) if balance < amount
   end
 
   def sell_chain(block,amount,price)

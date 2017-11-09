@@ -20,9 +20,9 @@
             <thead>
             <tr>
               <th tabindex="0" aria-controls="example1" style="text-align: center">区块</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">权重</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">单位</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">收益</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">链值</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">块量</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">溢价</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">状态</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center;width: 240px">操作</th>
             </tr>
@@ -38,13 +38,13 @@
                 </td>
                 <td>
                   <label class="btn bg-black btn-flat" style="font-size: 16px">
-                    <i class="fa fa-hourglass-1"></i>
-                    <%= item.weights %>
+                    <i class="fa fa-database"></i>
+                    <%= item.total_value %>
                   </label>
                 </td>
                 <td>
                   <label class="btn bg-black btn-flat" style="font-size: 16px">
-                    <i class="fa fa-cc-amex"></i>
+                    <i class="fa fa-cube"></i>
                     <%= item.unit %>
                   </label>
                 </td>
