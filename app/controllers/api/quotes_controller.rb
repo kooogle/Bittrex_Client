@@ -3,6 +3,7 @@ class Api::QuotesController < ApplicationController
   def hit_tickers
     Chain.all.each do |item|
       item.generate_ticker rescue nil
+      extremum_report(item) rescue nil
     end
     render json:{code:200}
   end
@@ -109,6 +110,15 @@ private
     order.amount = amount
     order.price = price
     order.save
+  end
+
+  def extremum_report(block)
+    td_quotes = block.block.tickers(96).map {|x| x.last_price}
+    if td_quotes.max == td_quotes[-1]
+      User.sms_yunpian("#{block.block},行情最高点,价值:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
+    elsif td_quotes.min == td_quotes[-1]
+      User.sms_yunpian("#{block.block},行情最低点,价值:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
+    end
   end
 
 end
