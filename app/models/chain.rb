@@ -19,15 +19,15 @@ class Chain < ActiveRecord::Base
   end
 
   def to_cny
-    finance_url = 'https://finance.yahoo.com/webservice/v1/symbols/allcurrencies/quote?format=json'
-    res = Faraday.get(finance_url)
-    finances = JSON.parse(res.body)
-    cny_finance = 0
-    finances['list']['resources'].each do |item|
-      if item['resource']['fields']['name'] == 'USD/CNY'
-        cny_finance = item['resource']['fields']['price'].to_f
-      end
-    end
+    # finance_url = 'https://finance.yahoo.com/webservice/v1/symbols/allcurrencies/quote?format=json'
+    # res = Faraday.get(finance_url)
+    # finances = JSON.parse(res.body)
+    # finances['list']['resources'].each do |item|
+    #   if item['resource']['fields']['name'] == 'USD/CNY'
+    #     cny_finance = item['resource']['fields']['price'].to_f
+    #   end
+    # end
+    cny_finance = 6.6375
     return (cny_finance * self.quote["Last"]).round(2) if self.currency == 'USDT'
     return (cny_finance * Chain.where(block:'ETH',currency:'USDT').first.quote["Last"]).round(2) if self.currency == 'ETH'
     return (cny_finance * Chain.where(block:'BTC',currency:'USDT').first.quote["Last"]).round(2) if self.currency == 'BTC'
