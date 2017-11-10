@@ -99,6 +99,8 @@ Rails.application.routes.draw do
         get 'quote'
         get 'init'
         get 'balance'
+        get 'buy'
+        get 'sell'
       end
     end
     resources :wechats do

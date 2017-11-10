@@ -39,11 +39,39 @@ class Api::StocksController < ApplicationController
     bals = Balance.sync_all
     bals.each do |item|
       if item['Balance'] > 0
-        balances[item['Currency']] = item['Balance']
+        balances[item['Currency']] = item['Balance'] > 1 ? item['Balance'].round(2) : item['Balance'].round(4)
       end
     end
     focus = Point.all.map {|x| {id:x.chain_id,block:x.chain.block,amount: balances[x.chain.block] || 0.0 }}.unshift({block:'USDT',amount:balances['USDT']})
     render json:{balances: focus}
+  end
+
+  def buy
+    block = Chain.find(params[:block])
+    ava_money = block.money
+    if ava_money > 0
+      chain_money = block.point.total_value
+      price = block.market.first['Ask']
+      buy_money = ava_money > chain_money ? chain_money : ava_money
+      amount = buy_money / price
+      amount = amount > 1 ? amount.to_d.round(2,:truncate).to_f : amount.to_d.round(4,:truncate).to_f
+      buy_chain(block,amount,price)
+    end
+    render json:{code:200}
+  end
+
+  def sell
+    block = Chain.find(params[:block])
+    balance = block.balance
+    if balance > 0
+      chain_money = block.point.total_value
+      price = block.market.first['Bid']
+      sell_amount = chain_money / price
+      amount = balance > sell_amount ? sell_amount : balance
+      amount = amount > 1 ? amount.to_d.round(2,:truncate).to_f : amount.to_d.round(4,:truncate).to_f
+      sell_chain(block,amount,price)
+    end
+    render json:{code:200}
   end
 
   private
@@ -61,6 +89,24 @@ class Api::StocksController < ApplicationController
       avg = (price_array.max + price_array.min) / 2
       return avg.round(2) if avg > 1
       return avg
+    end
+
+    def sell_chain(block,amount,price)
+      order = Order.new
+      order.deal = 0
+      order.chain_id = block.id
+      order.amount = amount
+      order.price = price
+      order.save
+    end
+
+    def buy_chain(block,amount,price)
+      order = Order.new
+      order.deal = 1
+      order.chain_id = block.id
+      order.amount = amount
+      order.price = price
+      order.save
     end
 
 end
