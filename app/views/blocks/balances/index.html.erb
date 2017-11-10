@@ -24,7 +24,7 @@
               <th tabindex="0" aria-controls="example1" style="text-align: center">总数</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">可用</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">挂单</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">地址</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">价值</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center;width: 240px">操作</th>
             </tr>
             </thead>
@@ -35,7 +35,7 @@
                 <td><%= item.balance %></td>
                 <td><%= item.available %></td>
                 <td><%= item.pending %></td>
-                <td><%= item.address %></td>
+                <td><%= (item.balance.to_f * item.chain.to_cny).round(2) if item.chain %></td>
                 <td>
                   <a href="<%= edit_blocks_balance_path(item) %>" class="btn bg-orange btn-flat">
                     <i class="glyphicon glyphicon-edit"></i>

@@ -7,6 +7,8 @@
 # t.datetime "updated_at",  null: false
 
 class Balance < ActiveRecord::Base
+
+  has_one :chain, class_name:'Chain', primary_key:'block', foreign_key:'block'
   scope :much, -> { order(balance: :asc)}
 
   def self.sync
