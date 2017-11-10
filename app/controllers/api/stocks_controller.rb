@@ -35,10 +35,15 @@ class Api::StocksController < ApplicationController
   end
 
   def balance
-    balances = Balance.sync_all
-    render json:{
-      balances: balances.map {|x| {title:x['Currency'],amount:x['Balance'],address:x['CryptoAddress']} if x['Balance'] > 0}.compact!
-    }
+    balances = {}
+    bals = Balance.sync_all
+    bals.each do |item|
+      if item['Balance'] > 0
+        balances[item['Currency']] = item['Balance']
+      end
+    end
+    focus = Point.all.map {|x| {id:x.chain_id,block:x.chain.block,amount: balances[x.chain.block] || 0.0 }}.unshift({block:'USDT',amount:balances['USDT']})
+    render json:{balances: focus}
   end
 
   private
