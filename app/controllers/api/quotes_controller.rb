@@ -83,8 +83,6 @@ private
       elsif block.kling_up_down_point?
         batch_part_sell(block,point.unit,balance,last_price,0.2)
       end
-    elsif last_price < block.last_buy_price * 0.9382
-      User.sms_yunpian("#{block.full_name},价格过低,请留意行情!")
     end
   end
 
