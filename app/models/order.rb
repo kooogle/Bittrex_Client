@@ -54,7 +54,11 @@ class Order < ActiveRecord::Base
       elsif self.sell?
         result = self.remote_sell_order rescue {}
       end
-      return self.update_attributes(state:true, result:result['result']['uuid']) if result['success']
+      if result['success']
+        self.update_attributes(state:true, result:result['result']['uuid'])
+        self.change_point_profit rescue {}
+        return true
+      end
       self.update_attributes(state:false, result:result['message'])
     end
   end
@@ -115,6 +119,28 @@ class Order < ActiveRecord::Base
       req.params['nonce'] = timetamp
     end
     result = JSON.parse(res.body)
+  end
+
+  def change_point_profit
+    if self.buy?
+      self.reset_profit
+    elsif self.sell?
+      self.increase_profit
+    end
+  end
+
+  def reset_profit
+    finance = 0.0618
+    fund = self.chain.last_buy_price
+    actual = finance * fund
+    self.chain.point.update_attributes(income:actual.to_i)
+  end
+
+  def increase_profit
+    finance = 0.00618
+    fund = self.chain.market.first['Bid']
+    actual = self.chain.point.income + finance * fund
+    self.chain.point.update_attributes(income:actual.to_i)
   end
 
 end
