@@ -42,7 +42,7 @@ class Api::StocksController < ApplicationController
         balances[item['Currency']] = item['Balance'] > 1 ? item['Balance'].round(2) : item['Balance'].round(4)
       end
     end
-    focus = Point.all.map {|x| {id:x.chain_id,block:x.chain.block,amount: balances[x.chain.block] || 0.0 }}.unshift({block:'USDT',amount:balances['USDT']})
+    focus = Point.all.map {|x| {id:x.chain_id,block:x.chain.block,amount: balances[x.chain.block] || 0.0,market:x.chain.market.first}}.unshift({block:'USDT',amount:balances['USDT']})
     render json:{balances: focus}
   end
 
