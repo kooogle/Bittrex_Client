@@ -111,7 +111,7 @@ private
   end
 
   def extremum_report(block)
-    td_quotes = block.tickers(96).map {|x| x.last_price}
+    td_quotes = block.tickers.last(96).map {|x| x.last_price}
     if td_quotes.max == td_quotes[-1]
       User.sms_yunpian("#{block.block},行情最高点,价值:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
     elsif td_quotes.min == td_quotes[-1]
