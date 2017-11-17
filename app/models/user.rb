@@ -13,14 +13,24 @@ class User < ActiveRecord::Base
     {0=>'管理员',2=>'普通用户'}[self.role]
   end
 
-  def self.sms_yunpian(content)
+  def self.sms_yunpian(mobile,content)
     yunpian = 'https://sms.yunpian.com/v2/sms/tpl_single_send.json'
     params = {}
     params[:apikey] = Settings.yunpian_key
     params[:tpl_id] = '1950240'
-    params[:mobile] = '18211109527'
+    params[:mobile] = mobile
     params[:tpl_value] = URI::escape('#report#') + '='+ URI::escape(content)
     Faraday.send(:post,yunpian, params)
+  end
+
+  def self.sms_batch(content)
+    mobiles = ['18211109527','13426000026']
+    mobiles.map {|mobile| User.sms_yunpian(mobile,content) }
+  end
+
+  def self.sms_notice(content)
+    mobiles = '18211109527'
+    User.sms_yunpian(mobile,content)
   end
 
   def self.sms_bao(content)
