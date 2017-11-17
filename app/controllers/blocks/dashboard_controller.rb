@@ -6,7 +6,8 @@ class Blocks::DashboardController < Blocks::BaseController
     end_time = params[:end] || Date.current.to_s
     @block = Chain.find(block)
     tickers = @block.tickers.where("mark >= ? AND mark <= ?",sta_time,end_time)
-    tickers = @block.tickers.last(24) if tickers.count < 10
+    tickers = @block.tickers.where("id <= ?", tickers.last.id).last(96) if tickers.count < 96 && tickers.count > 0
+    tickers = @block.tickers.last(96) if tickers.count == 0
     @date_array = tickers.map {|x| x.created_at.strftime('%m-%d %H:%M')}
     @value_array = tickers.map {|x| x.last_price}
     @ma5_array = tickers.map {|x| x.ma5_price}
