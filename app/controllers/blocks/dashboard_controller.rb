@@ -10,8 +10,8 @@ class Blocks::DashboardController < Blocks::BaseController
     tickers = @block.tickers.last(96) if tickers.count == 0
     @date_array = tickers.map {|x| x.created_at.strftime('%m-%d %H:%M')}
     @last_price = tickers.map {|x| x.last_price}
-    @macd_diff = tickers.map {|x| x.ma5_price}
-    @macd_dea = tickers.map {|x| x.ma10_price}
+    @macd_diff = tickers.map {|x| x.macd_diff}
+    @macd_dea = tickers.map {|x| x.macd_dea}
   end
 
   def pending
