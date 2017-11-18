@@ -67,23 +67,27 @@
             label: "市价线",
             data: <%= @value_array.compact %>,
             fill: false,
+            pointRadius: 0,
             backgroundColor: 'rgba(63,43,54,0.2)',
             borderColor: 'rgba(63,43,54, 1)',
-            lineTension: 0.25
+            lineTension: 0.15
           },{
             label: "五刻均价线",
             data: <%= @ma5_array.compact %>,
             fill: false,
+            pointRadius: 0,
             backgroundColor: 'rgba(27,129,62,0.2)',
             borderColor: 'rgba(27,129,62, 1)',
-            lineTension: 0.25
-          },{
+            lineTension: 0.15
+          },
+          {
             label: "十刻均价线",
             data: <%= @ma10_array.compact %>,
             fill: true,
+            pointRadius: 0,
             backgroundColor: 'rgba(203, 27, 69,0.2)',
             borderColor: 'rgba(203, 27, 69, 1)',
-            lineTension: 0.25
+            lineTension: 0.15
           }
         ]
       },

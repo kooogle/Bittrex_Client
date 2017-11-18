@@ -42,7 +42,7 @@ class Api::StocksController < ApplicationController
         balances[item['Currency']] = item['Balance'] > 1 ? item['Balance'].round(2) : item['Balance'].round(4)
       end
     end
-    focus = Point.all.map {|x| {id:x.chain_id,block:x.chain.block,amount: balances[x.chain.block] || 0.0 }}.unshift({block:'USDT',amount:balances['USDT']})
+    focus = Point.all.map {|x| {id:x.chain_id,block:x.chain.block,amount: balances[x.chain.block] || 0.0,market:x.chain.market.first}}.unshift({block:'USDT',amount:balances['USDT']})
     render json:{balances: focus}
   end
 
@@ -54,7 +54,7 @@ class Api::StocksController < ApplicationController
       price = block.market.first['Ask']
       buy_money = ava_money > chain_money ? chain_money : ava_money
       amount = buy_money.to_i / price
-      amount = amount > 1 ? amount.to_d.round(2,:truncate).to_f : amount.to_d.round(4,:truncate).to_f
+      amount = amount > 1 ? amount.to_d.round(4,:truncate).to_f : amount.to_d.round(4,:truncate).to_f
       buy_chain(block,amount,price)
     end
     render json:{code:200}
@@ -68,7 +68,7 @@ class Api::StocksController < ApplicationController
       price = block.market.first['Bid']
       sell_amount = chain_money / price
       amount = balance > sell_amount ? sell_amount : balance
-      amount = amount > 1 ? amount.to_d.round(2,:truncate).to_f : amount.to_d.round(4,:truncate).to_f
+      amount = amount > 1 ? amount.to_d.round(4,:truncate).to_f : amount.to_d.round(4,:truncate).to_f
       sell_chain(block,amount,price)
     end
     render json:{code:200}

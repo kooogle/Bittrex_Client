@@ -1,16 +1,16 @@
 # t.integer  "chain_id",   limit: 4
 # t.float    "last_price", limit: 24
 # t.float    "ma5_price",  limit: 24
-# t.float    "ma10_price",  limit: 24
+# t.float    "ma10_price", limit: 24
 # t.date     "mark"
 # t.float    "volume",     limit: 24
-# t.datetime "created_at",  null: false
-# t.datetime "updated_at",  null: false
 # t.float    "macd_diff",  limit: 24
 # t.float    "macd_dea",  limit: 24
 # t.float    "macd_bar",  limit: 24
 # t.float    "macd_fast",  limit: 24
 # t.float    "macd_slow",  limit: 24
+# t.datetime "created_at",  null: false
+# t.datetime "updated_at",  null: false
 
 class Ticker < ActiveRecord::Base
   after_save :sync_ma_price
