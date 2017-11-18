@@ -21,13 +21,13 @@ class Ticker < ActiveRecord::Base
 
   def sync_ma_price
     if self.ma5_price.nil?
-      self.update_attributes(ma5_price:self.recent_ema(5),ma10_price:self.recent_ema(5))
+      self.update_attributes(ma5_price:self.recent_ema(3),ma10_price:self.recent_ema(8))
     end
   end
 
   def recent_ema(number)
     ema_array = Ticker.where('id <= ? and chain_id = ?',self.id,self.chain_id).last(number).map {|x| x.last_price }
-    average = (ten_array.sum / number).round(8)
+    average = (ema_array.sum / number).round(8)
   end
 
   def sync_macd
