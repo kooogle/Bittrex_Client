@@ -64,16 +64,16 @@
         labels: <%= raw @date_array %>,
         datasets: [
           {
-            label: "市价线",
-            data: <%= @value_array.compact %>,
+            label: "市价 线",
+            data: <%= @last_price.compact %>,
             fill: false,
             pointRadius: 0,
             backgroundColor: 'rgba(63,43,54,0.2)',
             borderColor: 'rgba(63,43,54, 1)',
             lineTension: 0.15
           },{
-            label: "五刻均价线",
-            data: <%= @ma5_array.compact %>,
+            label: "DIF 线",
+            data: <%= @macd_diff.compact %>,
             fill: false,
             pointRadius: 0,
             backgroundColor: 'rgba(27,129,62,0.2)',
@@ -81,8 +81,8 @@
             lineTension: 0.15
           },
           {
-            label: "十刻均价线",
-            data: <%= @ma10_array.compact %>,
+            label: "DEA 线",
+            data: <%= @macd_dea.compact %>,
             fill: true,
             pointRadius: 0,
             backgroundColor: 'rgba(203, 27, 69,0.2)',
