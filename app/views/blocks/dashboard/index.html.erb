@@ -50,8 +50,8 @@
     <div class="box-body">
       <div class="row">
         <div class="col-sm-12">
-        <canvas id="myChart"></canvas>
-        <canvas id="myMacd" style="height:200px"></canvas>
+          <canvas id="myChart"></canvas>
+          <canvas id="myMacd"></canvas>
         </div>
       </div>
     </div>
@@ -62,6 +62,7 @@
   var myLineChart = new Chart(ctx, {
       type: 'line',
       data: {
+        labels: <%= raw @date_array %>,
         datasets: [
           {
             label: "市价 线",
@@ -85,6 +86,7 @@
       }
   });
   var ctx1 = document.getElementById("myMacd").getContext('2d');
+  ctx1.height = 200;
   var myLineChart1 = new Chart(ctx1, {
       type: 'line',
       data: {
@@ -110,8 +112,7 @@
           }
         ]
       },
-      options: {
-        duration: 200
-      }
+      maintainAspectRatio: false,
+      options: {duration: 200}
   });
 </script>
