@@ -11,7 +11,7 @@ class Api::QuotesController < ApplicationController
   def hit_markets
     Chain.all.each do |item|
       if item.point && item.point.state
-        quote_analysis(item)
+        quote_macd_analysis(item)
       end
     end
     render json:{code:200}
@@ -41,6 +41,79 @@ private
       sell_analysis(block,market)
     elsif ma5_price < ma10_price
       buy_analysis(block,market)
+    end
+  end
+
+  def quote_macd_analysis(block)
+    market = block.market
+    recent = block.tickers.last(10)
+    macd_diff_last = recent.map {|x| x.macd_diff }
+    diff_dea_last = recent.map {|x| x.macd_diff - macd_dea }
+    if macd_diff_last.min > 0 && macd_diff_last[-1] == macd_diff_last.max
+      sell_a_analysis(block,market)
+    elsif macd_diff_last.min > 0 && macd_diff_last[-2] == macd_diff_last.max
+      sell_b_analysis(block,market)
+    elsif macd_diff_last.min > 0 && diff_dea_last[-1] < 0  && diff_dea_last[-2] > 0
+      sell_c_analysis(block,market)
+    elsif diff_dea_last[-1] < 0  && diff_dea_last[-2] > 0
+      sell_c_analysis(block,market)
+    elsif macd_diff_last.min > 0 && macd_diff_last[-2] == macd_diff_last.max
+      buy_a_analysis(block,market)
+    elsif macd_diff_last.max < 0 && diff_dea_last[-1] > 0 && diff_dea_last[-2] < 0
+      buy_a_analysis(block,market)
+    elsif macd_diff_last.max < 0 && macd_diff_last[-2] == macd_diff_last.min
+      buy_a_analysis(block,market)
+    elsif diff_dea_last[-1] > 0 && diff_dea_last[-2] < 0
+      buy_a_analysis(block,market)
+    end
+  end
+
+  def sell_a_analysis(block,market)
+    last_price = market.first['Bid']
+    balance = block.balance
+    if balance > 0 && last_price > block.greater_income
+      if  block.high_nearby(last_price)
+        sell_chain(block,balance * 0.15,last_price)
+      elsif  last_price > block.high
+        sell_chain(block,balance * 0.3,last_price)
+      end
+    end  
+  end
+
+  def sell_b_analysis(block,market)
+    last_price = market.first['Bid']
+    balance = block.balance
+    if balance > 0 && last_price > block.greater_income
+      if  block.high_nearby(last_price)
+        sell_chain(block,balance * 0.2,last_price)
+      else
+        sell_chain(block,balance * 0.1,last_price)
+      end
+    end
+  end
+
+  def sell_c_analysis(block,market)
+    last_price = market.first['Bid']
+    balance = block.balance
+    if balance > 0 && last_price > block.greater_income
+        sell_chain(block,balance,last_price)
+    end
+  end
+
+  def sell_d_analysis(block,market)
+    last_price = market.first['Bid']
+    balance = block.balance
+    if balance > 0 && last_price > block.greater_income
+        sell_chain(block,balance * 0.1,last_price)
+    end
+  end
+
+  def buy_a_analysis(block,market)
+    last_price = market.first['Ask']
+    money = block.batch_money
+    if money > 0
+      amount = (money/last_price).to_d.round(4,:truncate).to_f
+      buy_chain(block,amount,last_price) if amount > 0
     end
   end
 
@@ -105,7 +178,7 @@ private
   end
 
   def extremum_report(block)
-    td_quotes = block.tickers.last(96).map {|x| x.last_price}
+    td_quotes = block.tickers.last(48).map {|x| x.last_price}
     if td_quotes.max == td_quotes[-1]
       User.sms_batch("#{block.block},行情最高点,价值:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
     elsif td_quotes.min == td_quotes[-1]

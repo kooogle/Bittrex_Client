@@ -51,6 +51,7 @@
       <div class="row">
         <div class="col-sm-12">
         <canvas id="myChart"></canvas>
+        <canvas id="myMacd" style="height:200px"></canvas>
         </div>
       </div>
     </div>
@@ -61,7 +62,6 @@
   var myLineChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: <%= raw @date_array %>,
         datasets: [
           {
             label: "市价 线",
@@ -71,7 +71,26 @@
             backgroundColor: 'rgba(63,43,54,0.2)',
             borderColor: 'rgba(63,43,54, 1)',
             lineTension: 0.15
-          },{
+          }
+        ]
+      },
+      options: {
+        duration: 200,
+        title: {
+          display: true,
+          fontSize: 18,
+          fontColor: 'rgba(246, 81, 29, 1)',
+          text: "<%= @block.full_name %> K-Line"
+        }
+      }
+  });
+  var ctx1 = document.getElementById("myMacd").getContext('2d');
+  var myLineChart1 = new Chart(ctx1, {
+      type: 'line',
+      data: {
+        labels: <%= raw @date_array %>,
+        datasets: [
+        {
             label: "DIF 线",
             data: <%= @macd_diff.compact %>,
             fill: false,
@@ -92,13 +111,7 @@
         ]
       },
       options: {
-        duration: 200,
-        title: {
-          display: true,
-          fontSize: 18,
-          fontColor: 'rgba(246, 81, 29, 1)',
-          text: "<%= @block.full_name %> K-Line"
-        }
+        duration: 200
       }
   });
 </script>
