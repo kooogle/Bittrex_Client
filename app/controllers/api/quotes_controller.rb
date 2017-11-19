@@ -76,6 +76,8 @@ private
         sell_chain(block,balance * 0.15,last_price)
       elsif  last_price > block.high
         sell_chain(block,balance * 0.3,last_price)
+      else
+        sell_chain(block,balance * 0.1,last_price)
       end
     end  
   end
