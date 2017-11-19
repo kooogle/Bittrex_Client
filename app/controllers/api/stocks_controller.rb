@@ -11,8 +11,8 @@ class Api::StocksController < ApplicationController
       price: tickers.map{|x| x.last_price},
       ma5_price: tickers.map{|x| x.ma5_price},
       ma10_price: tickers.map{|x| x.ma10_price},
-      volume: tickers.map{|x| x.volume },
-      col_color: columnar_color(tickers.map{|x| x.volume})
+      macd_val: tickers.map{|x| x.macd_diff - x.macd_dea },
+      macd_col: macd_color(tickers.map{|x| x.macd_diff - x.macd_dea })
     }
   end
 
@@ -29,8 +29,8 @@ class Api::StocksController < ApplicationController
       price: tickers.map{|x| x.last_price},
       ma5_price: tickers.map{|x| x.ma5_price},
       ma10_price: tickers.map{|x| x.ma10_price},
-      volume: tickers.map{|x| x.volume },
-      col_color: columnar_color(tickers.map{|x| x.volume})
+      macd_val: tickers.map{|x| x.macd_diff - x.macd_dea },
+      macd_col: macd_color(tickers.map{|x| x.macd_diff - x.macd_dea })
     }
   end
 
@@ -81,6 +81,14 @@ class Api::StocksController < ApplicationController
       quote_array.each do |item|
         color_array << (item - flag > 0? 'green' : 'red')
         flag = item
+      end
+      return color_array
+    end
+
+    def macd_color(macd_array)
+      color_array = []
+      macd_array.each do |item|
+        color_array << (item > 0? 'green' : 'red')
       end
       return color_array
     end

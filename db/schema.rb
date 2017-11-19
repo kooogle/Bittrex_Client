@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171102083422) do
+ActiveRecord::Schema.define(version: 20171118132256) do
 
   create_table "balances", force: :cascade do |t|
     t.string   "block",      limit: 255
@@ -64,6 +64,11 @@ ActiveRecord::Schema.define(version: 20171102083422) do
     t.datetime "updated_at",            null: false
     t.float    "ma10_price", limit: 24
     t.float    "volume",     limit: 24
+    t.float    "macd_fast",  limit: 24
+    t.float    "macd_slow",  limit: 24
+    t.float    "macd_diff",  limit: 24
+    t.float    "macd_dea",   limit: 24
+    t.float    "macd_bar",   limit: 24
   end
 
   create_table "users", force: :cascade do |t|
