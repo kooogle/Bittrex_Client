@@ -51,7 +51,7 @@
       <div class="row">
         <div class="col-sm-12">
           <canvas id="myChart"></canvas>
-          <canvas id="myMacd"></canvas>
+          <canvas id="myMacd" height="200px"></canvas>
         </div>
       </div>
     </div>
@@ -86,7 +86,6 @@
       }
   });
   var ctx1 = document.getElementById("myMacd").getContext('2d');
-  ctx1.height = 200;
   var myLineChart1 = new Chart(ctx1, {
       type: 'line',
       data: {
@@ -112,7 +111,6 @@
           }
         ]
       },
-      maintainAspectRatio: false,
-      options: {duration: 200}
+      options: {duration: 200,responsive:false}
   });
 </script>
