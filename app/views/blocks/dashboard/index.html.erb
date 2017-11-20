@@ -62,7 +62,7 @@
   var myLineChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: <%= raw Array.new(@date_array.size,'') %>,
+        labels: <%= raw @date_array %>,
         datasets: [
           {
             label: "市价 线",

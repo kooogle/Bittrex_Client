@@ -2,17 +2,17 @@ class Api::StocksController < ApplicationController
 
   def quote
     block = params[:block] || Chain.named.first.id
-    amount = params[:amount] || 24
+    amount = params[:amount] || 48
     chain = Chain.find(block)
     tickers = chain.tickers.last(amount.to_i)
     render json:{
       avg_price:avg_price(tickers.map{|x| x.last_price}),
-      time: tickers.map{|x| x.created_at.strftime('%H:%M')},
+      time: tickers.map{|x| x.created_at.strftime('%d-%H')},
       price: tickers.map{|x| x.last_price},
       ma5_price: tickers.map{|x| x.ma5_price},
       ma10_price: tickers.map{|x| x.ma10_price},
-      macd_val: tickers.map{|x| x.macd_diff - x.macd_dea },
-      macd_col: macd_color(tickers.map{|x| x.macd_diff - x.macd_dea })
+      macd_diff: tickers.map{|x| x.macd_diff },
+      macd_dea: tickers.map{|x| x.macd_dea }
     }
   end
 
@@ -29,8 +29,8 @@ class Api::StocksController < ApplicationController
       price: tickers.map{|x| x.last_price},
       ma5_price: tickers.map{|x| x.ma5_price},
       ma10_price: tickers.map{|x| x.ma10_price},
-      macd_val: tickers.map{|x| x.macd_diff - x.macd_dea },
-      macd_col: macd_color(tickers.map{|x| x.macd_diff - x.macd_dea })
+      macd_diff: tickers.map{|x| x.macd_diff },
+      macd_dea: tickers.map{|x| x.macd_dea }
     }
   end
 

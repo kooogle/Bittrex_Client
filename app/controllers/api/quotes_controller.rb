@@ -7,7 +7,7 @@ class Api::QuotesController < ApplicationController
     end
     render json:{code:200}
   end
-  #每10分钟获取一次最新价格，根据价格涨幅做买卖通知
+  #每5分钟获取一次最新价格，根据价格涨幅做买卖通知
   def hit_markets
     Chain.all.each do |item|
       if item.point && item.point.state
@@ -43,12 +43,12 @@ private
       buy_analysis(block,market)
     end
   end
-
+  #根据 MACD
   def quote_macd_analysis(block)
     market = block.market
     recent = block.tickers.last(10)
     macd_diff_last = recent.map {|x| x.macd_diff }
-    diff_dea_last = recent.map {|x| x.macd_diff - macd_dea }
+    diff_dea_last = recent.map {|x| x.macd_diff - x.macd_dea }
     if macd_diff_last.min > 0 && macd_diff_last[-1] == macd_diff_last.max
       sell_a_analysis(block,market)
     elsif macd_diff_last.min > 0 && macd_diff_last[-2] == macd_diff_last.max
@@ -79,7 +79,7 @@ private
       else
         sell_chain(block,balance * 0.1,last_price)
       end
-    end  
+    end
   end
 
   def sell_b_analysis(block,market)
@@ -119,48 +119,6 @@ private
     end
   end
 
-  def buy_analysis(block,market)
-    last_price = market.first['Ask']
-    low_price = market.first['Low']
-    money = block.batch_money
-    if last_price < block.low && last_price > low_price && money > 0
-      amount = (money/last_price).to_d.round(4,:truncate).to_f
-      buy_chain(block,amount,last_price) if amount > 0
-    elsif block.low_nearby(last_price)
-      amount = (money/last_price).to_d.round(4,:truncate).to_f
-      buy_chain(block,point.unit,last_price) if amount > 0
-    elsif block.kling_down_up_point? && last_price < block.tickers.last.last_price
-      amount = (money/last_price).to_d.round(4,:truncate).to_f
-      buy_chain(block,amount,last_price) if amount > 0
-    end
-  end
-
-  def sell_analysis(block,market)
-    last_price = market.first['Bid']
-    high_price = market.first['High']
-    amount = block.point.unit
-    balance = block.balance
-    if last_price > block.greater_income && balance > 0
-      if last_price > block.high && last_price < high_price
-        batch_part_sell(block,amount,balance,last_price,0.3)
-      elsif block.high_nearby(last_price)
-        batch_part_sell(block,amount,balance,last_price,0.25)
-      elsif block.kling_up_down_point? && last_price > block.tickers.last.last_price
-        batch_part_sell(block,amount,balance,last_price,0.2)
-      end
-    elsif last_price < block.last_buy_price * 0.9382 && balance > 0
-      sell_chain(block,balance,last_price)
-      block.close_merch
-      User.sms_notice("#{block.block},止损点,价值:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
-    end
-  end
-
-  def batch_part_sell(block,amount,balance,price,percent)
-    sell_chain(block,(balance * percent).round(4),price) if (balance * percent).round(4) > amount
-    sell_chain(block,amount,price) if (balance * percent).round(4) < amount && amount < balance
-    sell_chain(block,balance,price) if balance < amount
-  end
-
   def sell_chain(block,amount,price)
     order = Order.new
     order.deal = 0
@@ -189,3 +147,45 @@ private
   end
 
 end
+
+# def buy_analysis(block,market)
+#   last_price = market.first['Ask']
+#   low_price = market.first['Low']
+#   money = block.batch_money
+#   if last_price < block.low && last_price > low_price && money > 0
+#     amount = (money/last_price).to_d.round(4,:truncate).to_f
+#     buy_chain(block,amount,last_price) if amount > 0
+#   elsif block.low_nearby(last_price)
+#     amount = (money/last_price).to_d.round(4,:truncate).to_f
+#     buy_chain(block,point.unit,last_price) if amount > 0
+#   elsif block.kling_down_up_point? && last_price < block.tickers.last.last_price
+#     amount = (money/last_price).to_d.round(4,:truncate).to_f
+#     buy_chain(block,amount,last_price) if amount > 0
+#   end
+# end
+
+# def sell_analysis(block,market)
+#   last_price = market.first['Bid']
+#   high_price = market.first['High']
+#   amount = block.point.unit
+#   balance = block.balance
+#   if last_price > block.greater_income && balance > 0
+#     if last_price > block.high && last_price < high_price
+#       batch_part_sell(block,amount,balance,last_price,0.3)
+#     elsif block.high_nearby(last_price)
+#       batch_part_sell(block,amount,balance,last_price,0.25)
+#     elsif block.kling_up_down_point? && last_price > block.tickers.last.last_price
+#       batch_part_sell(block,amount,balance,last_price,0.2)
+#     end
+#   elsif last_price < block.last_buy_price * 0.9382 && balance > 0
+#     sell_chain(block,balance,last_price)
+#     block.close_merch
+#     User.sms_notice("#{block.block},止损点,价值:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
+#   end
+# end
+
+# def batch_part_sell(block,amount,balance,price,percent)
+#   sell_chain(block,(balance * percent).round(4),price) if (balance * percent).round(4) > amount
+#   sell_chain(block,amount,price) if (balance * percent).round(4) < amount && amount < balance
+#   sell_chain(block,balance,price) if balance < amount
+# end
