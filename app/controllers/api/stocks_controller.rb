@@ -12,7 +12,7 @@ class Api::StocksController < ApplicationController
       ma5_price: tickers.map{|x| x.ma5_price},
       ma10_price: tickers.map{|x| x.ma10_price},
       macd_diff: tickers.map{|x| x.macd_diff },
-      macd_dea: tickers.map{|x| x.macd_dea }
+      macd_color: macd_color(tickers.map{|x| x.macd_diff })
     }
   end
 
@@ -30,7 +30,7 @@ class Api::StocksController < ApplicationController
       ma5_price: tickers.map{|x| x.ma5_price},
       ma10_price: tickers.map{|x| x.ma10_price},
       macd_diff: tickers.map{|x| x.macd_diff },
-      macd_dea: tickers.map{|x| x.macd_dea }
+      macd_color: macd_color(tickers.map{|x| x.macd_diff })
     }
   end
 
