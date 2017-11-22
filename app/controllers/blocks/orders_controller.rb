@@ -2,7 +2,10 @@ class Blocks::OrdersController < Blocks::BaseController
   before_action :set_order, only:[:edit, :update, :destroy]
 
   def index
-    @orders = Order.latest.paginate(page:params[:page])
+    orders = Order.all
+    orders = orders.where(deal:params[:business]) if params[:business].present?
+    orders = orders.where(chain_id:params[:block]) if params[:block].present?
+    @orders =orders.latest.paginate(page:params[:page])
   end
 
   def new
