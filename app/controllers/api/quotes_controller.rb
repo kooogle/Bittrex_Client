@@ -82,11 +82,17 @@ private
     buy = block.low_buy_business.order(price: :asc).first
     balance = block.balance
     if balance > buy.amount
-      sell_chain(block,buy.amount,last_price) if last_price > (buy.price + block.income)
-      sell_chain(block,buy.amount,last_price) if last_price > buy.price * 1.0309
+      if last_price > (buy.price + block.income)
+        sell_chain(block,buy.amount,last_price)
+      elsif last_price > buy.price * 1.0309
+        sell_chain(block,buy.amount,last_price)
+      end
     else
-      sell_chain(block,balance,last_price) if last_price > (buy.price + block.income)
-      sell_chain(block,balance,last_price) if last_price > buy.price * 1.0309
+      if last_price > (buy.price + block.income)
+        sell_chain(block,balance,last_price)
+      elsif last_price > buy.price * 1.0309
+        sell_chain(block,balance,last_price)
+      end
     end
   end
 
