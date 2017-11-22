@@ -55,6 +55,24 @@
         <%= f.text_field :income, class:'form-control', placeholder:'（必填* 期望收益的最低价）' %>
       </div>
     </div>
+    <div class="form-group has-warning">
+      <label>高频总值</label>
+      <div class="input-group">
+        <div class="input-group-addon">
+          <i class="fa fa-usd"></i>
+        </div>
+        <%= f.text_field :high_value, class:'form-control', placeholder:'（必填* 高频持有区块总值）' %>
+      </div>
+    </div>
+    <div class="form-group has-warning">
+      <label>高频单价</label>
+      <div class="input-group">
+        <div class="input-group-addon">
+          <i class="fa fa-usd"></i>
+        </div>
+        <%= f.text_field :high_price, class:'form-control', placeholder:'（必填* 高频买入单次价格）' %>
+      </div>
+    </div>
   </div>
   <div class="col-md-12">
     <hr>

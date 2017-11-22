@@ -20,11 +20,14 @@
             <thead>
             <tr>
               <th tabindex="0" aria-controls="example1" style="text-align: center">区块</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">链值</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">块量</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">溢价</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">链值</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">高买价</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">高总值</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">状态</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center;width: 240px">操作</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">频率</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center;">操作</th>
             </tr>
             </thead>
             <tbody>
@@ -36,35 +39,23 @@
                     <%= item.chain.full_name %>
                   </label>
                 </td>
+                <td><%= item.unit %></td>
+                <td><%= item.income %></td>
+                <td><%= item.total_value %></td>
+                <td><%= item.high_price %></td>
+                <td><%= item.high_value %></td>
                 <td>
-                  <label class="btn bg-black btn-flat" style="font-size: 16px">
-                    <i class="fa fa-database"></i>
-                    <%= item.total_value %>
-                  </label>
+                  <input type="checkbox" name="my-state" <%= 'checked' if item.state %> onchange='switch_state(<%= item.id %>)'>
                 </td>
                 <td>
-                  <label class="btn bg-black btn-flat" style="font-size: 16px">
-                    <i class="fa fa-cube"></i>
-                    <%= item.unit %>
-                  </label>
-                </td>
-                <td>
-                  <label class="btn bg-black btn-flat" style="font-size: 16px">
-                    <i class="fa fa-cc-jcb"></i>
-                    <%= item.income %>
-                  </label>
-                </td>
-                <td>
-                  <input type="checkbox" name="my-checkbox" <%= 'checked' if item.state %> onchange='switch_state(<%= item.id %>)'>
+                  <input type="checkbox" name="my-frequency" <%= 'checked' if item.frequency %> onchange='frequency_state(<%= item.id %>)'>
                 </td>
                 <td>
                   <a href="<%= edit_blocks_point_path(item) %>" class="btn bg-orange btn-flat">
                     <i class="glyphicon glyphicon-edit"></i>
-                    编辑
                   </a>
                   <a href="<%= blocks_point_path(item) %>" class="btn bg-red btn-flat" data-method="delete" data-confirm="确定删除事务焦点吗？">
                     <i class="glyphicon glyphicon-trash"></i>
-                    删除
                   </a>
                 </td>
               </tr>
@@ -91,6 +82,10 @@
     function switch_state(item) {
       $.get('/blocks/points/' + item +'/change_state');
     }
-    $("[name='my-checkbox']").bootstrapSwitch({onColor:'success',offColor:'danger'});
+    function frequency_state(item) {
+      $.get('/blocks/points/' + item +'/change_frequency');
+    }
+    $("[name='my-state']").bootstrapSwitch({onColor:'success',offColor:'danger'});
+    $("[name='my-frequency']").bootstrapSwitch({onColor:'danger',offColor:'primary',onText:'高频',offText:'低频'});
   </script>
 <% end %>

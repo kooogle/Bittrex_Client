@@ -5,6 +5,9 @@
 # t.float    "unit",         limit: 24
 # t.boolean  "state"
 # t.float    "income",       limit: 24
+# t.boolean  "frequency",    default: false
+# t.float    "high_value",   limit: 24
+# t.float    "high_price",   limit: 24
 # t.datetime "created_at",   null: false
 # t.datetime "updated_at",   null: false
 

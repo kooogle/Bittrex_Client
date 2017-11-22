@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171118132256) do
+ActiveRecord::Schema.define(version: 20171122034025) do
 
   create_table "balances", force: :cascade do |t|
     t.string   "block",      limit: 255
@@ -38,9 +38,11 @@ ActiveRecord::Schema.define(version: 20171118132256) do
     t.float    "price",      limit: 24
     t.float    "total",      limit: 24
     t.boolean  "state"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
     t.string   "result",     limit: 255
+    t.boolean  "frequency",              default: false
+    t.boolean  "repurchase",             default: false
   end
 
   create_table "points", force: :cascade do |t|
@@ -50,9 +52,12 @@ ActiveRecord::Schema.define(version: 20171118132256) do
     t.float    "total_value",  limit: 24
     t.float    "unit",         limit: 24
     t.boolean  "state"
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
     t.float    "income",       limit: 24
+    t.boolean  "frequency",               default: false
+    t.float    "high_value",   limit: 24
+    t.float    "high_price",   limit: 24
   end
 
   create_table "tickers", force: :cascade do |t|

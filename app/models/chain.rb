@@ -11,7 +11,8 @@ class Chain < ActiveRecord::Base
   self.per_page = 10
   has_many :tickers, dependent: :destroy
   has_many :business, class_name:'Order'
-  has_many :buy_business,->{where(deal:1,state:true)}, class_name:'Order'
+  has_many :low_buy_business,->{where(deal:1,state:true,frequency:false,repurchase:false)}, class_name:'Order' #低频买单记录
+  has_many :high_buy_business,->{where(deal:1,state:true,frequency:true,repurchase:false)}, class_name:'Order' #高频买单价格未回购记录
   has_one :point, class_name:'Point'
   has_one :wallet, class_name:'Balance', primary_key:'block', foreign_key:'block'
 
@@ -97,8 +98,12 @@ class Chain < ActiveRecord::Base
     self.last_buy_price + self.point.income
   end
 
+  def income
+    self.point.income
+  end
+
   def last_buy_price
-    if buy = self.business.where(deal:1,state:true).last(5)
+    if buy = self.low_buy_business.last(5)
       buy_array = buy.map {|x| x.price }
       buy_average = buy_array.sum / buy_array.size
       return buy_average.to_i if buy_average.to_i > 0

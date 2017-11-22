@@ -5,6 +5,8 @@
 # t.float    "total",      limit: 24
 # t.boolean  "state"
 # t.string   "result",     limit: 255
+# t.boolean  "frequency",  default: false
+# t.boolean  "repurchase", default: false
 # t.datetime "created_at", null: false
 # t.datetime "updated_at", null: false
 
@@ -32,6 +34,26 @@ class Order < ActiveRecord::Base
     {true=>'已挂单',false=>'未激活'}[self.state]
   end
 
+  def frequency_cn
+    {true=>'高频',false=>'低频'}[self.frequency]
+  end
+
+  def repurchase_cn
+    {true=>'已出单',false=>'未回购'}[self.repurchase]
+  end
+
+  def show_repurchase_cn
+    return self.repurchase_cn if self.frequency && self.buy?
+  end
+
+  def shown_time
+    if Time.now - self.created_at > 1.day
+      time_ago_in_words self.created_at
+    else
+      self.created_at.strftime('%H:%M:%S')
+    end
+  end
+
   def calculate_total
     if self.total.nil?
       self.update_attributes(total: self.amount * self.price)
@@ -56,7 +78,8 @@ class Order < ActiveRecord::Base
       end
       if result['success']
         self.update_attributes(state:true, result:result['result']['uuid'])
-        self.change_point_profit rescue {}
+        self.change_point_profit rescue {} unless self.frequency #低频买卖才同步
+        self.sync_repurchase rescue {} if self.sell? #卖出执行回单
         return true
       end
       self.update_attributes(state:false, result:result['message'])
@@ -141,6 +164,14 @@ class Order < ActiveRecord::Base
     fund = self.chain.market.first['Bid']
     actual = self.chain.point.income + finance * fund
     self.chain.point.update_attributes(income:actual.to_i)
+  end
+
+  def sync_repurchase
+    if self.frequency
+      self.chain.high_buy_business.order(price: :asc).first.update_attributes(repurchase:true)
+    else
+      self.chain.low_buy_business.order(price: :asc).first.update_attributes(repurchase:true)
+    end
   end
 
 end

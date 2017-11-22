@@ -77,6 +77,7 @@ Rails.application.routes.draw do
     resources :points do
       member do
         get 'change_state'
+        get 'change_frequency'
       end
     end
     resources :orders do

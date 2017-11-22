@@ -7,11 +7,21 @@ class Api::QuotesController < ApplicationController
     end
     render json:{code:200}
   end
-  #每5分钟获取一次最新价格，根据价格涨幅做买卖通知
+  #每5分钟获取一次最新价格，根据价格涨幅做买卖通知 低频交易
   def hit_markets
     Chain.all.each do |item|
       if item.point && item.point.state
         quote_macd_analysis(item)
+      end
+    end
+    render json:{code:200}
+  end
+
+  #每1分钟获取一次最新价格，高频交易
+  def hit_high_markets
+    Chain.all.each do |item|
+      if item.point && item.point.frequency
+        high_analysis(item)
       end
     end
     render json:{code:200}
@@ -43,6 +53,7 @@ private
       buy_analysis(block,market)
     end
   end
+
   #根据 MACD
   def quote_macd_analysis(block)
     market = block.market
@@ -52,9 +63,9 @@ private
     if macd_diff_last.min > 0 && macd_diff_last[-1] == macd_diff_last.max
       sell_a_analysis(block,market)
     elsif macd_diff_last.min > 0 && macd_diff_last[-2] == macd_diff_last.max
-      sell_b_analysis(block,market)
+      sell_a_analysis(block,market)
     elsif macd_diff_last.max > 0 && diff_dea_last[-1] < 0  && diff_dea_last[-2] > 0
-      sell_c_analysis(block,market)
+      sell_a_analysis(block,market)
     elsif macd_diff_last.min > 0 && macd_diff_last[-2] == macd_diff_last.max
       buy_a_analysis(block,market)
     elsif macd_diff_last.max < 0 && diff_dea_last[-1] > 0 && diff_dea_last[-2] < 0
@@ -68,52 +79,14 @@ private
 
   def sell_a_analysis(block,market)
     last_price = market.first['Bid']
+    buy = block.low_buy_business.order(price: :asc).first
     balance = block.balance
-    buy_max = block.buy_business.last(7).sort_by {|x| x.price}.last
-    if balance > 0 && last_price > block.greater_income
-      if  block.high_nearby(last_price)
-        sell_chain(block,balance * 0.15,last_price)
-      elsif  last_price > block.high
-        sell_chain(block,balance * 0.3,last_price)
-      else
-        sell_chain(block,balance * 0.1,last_price)
-      end
-    elsif balance > 0 && last_price > buy_max.price * 1.02
-      sell_chain(block,buy_max.amount,last_price)
-    end
-  end
-
-  def sell_b_analysis(block,market)
-    last_price = market.first['Bid']
-    balance = block.balance
-    buy_max = block.buy_business.last(7).sort_by {|x| x.price}.last
-    if balance > 0 && last_price > block.greater_income
-      if  block.high_nearby(last_price)
-        sell_chain(block,balance * 0.2,last_price)
-      else
-        sell_chain(block,balance * 0.1,last_price)
-      end
-    elsif balance > 0 && last_price > buy_max.price * 1.015
-      sell_chain(block,buy_max.amount,last_price)
-    end
-  end
-
-  def sell_c_analysis(block,market)
-    last_price = market.first['Bid']
-    balance = block.balance
-    buy_max = block.buy_business.last(7).sort_by {|x| x.price}.last
-    if balance > 0 && last_price > block.greater_income
-      sell_chain(block,balance,last_price)
-    elsif balance > 0 && last_price > buy_max.price * 1.01
-      sell_chain(block,buy_max.amount,last_price)
-    end
-  end
-
-  def sell_d_analysis(block,market)
-    last_price = market.first['Bid']
-    balance = block.balance
-    if balance > 0 && last_price > block.greater_income
-        sell_chain(block,balance * 0.1,last_price)
+    if balance > buy.amount
+      sell_chain(block,buy.amount,last_price) if last_price > (buy.price + block.income)
+      sell_chain(block,buy.amount,last_price) if last_price > buy.price * 1.0309
+    else
+      sell_chain(block,balance,last_price) if last_price > (buy.price + block.income)
+      sell_chain(block,balance,last_price) if last_price > buy.price * 1.0309
     end
   end
 
@@ -151,6 +124,9 @@ private
     elsif td_quotes.min == td_quotes[-1]
       User.sms_batch("#{block.block},行情最低点,价值:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
     end
+  end
+
+  def high_analysis(block)
   end
 
 end

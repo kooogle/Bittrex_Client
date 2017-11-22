@@ -48,12 +48,24 @@ class Blocks::PointsController < Blocks::BaseController
     render json:{code:200}
   end
 
+  def change_frequency
+    if @point.frequency
+      @point.frequency = false
+      @point.save
+    else
+      @point.frequency = true
+      @point.save
+    end
+    render json:{code:200}
+  end
+
   private
     def set_point
       @point = Point.find(params[:id])
     end
 
     def point_params
-      params.require(:point).permit(:chain_id,:weights,:total_amount,:total_value,:unit,:state,:income)
+      params.require(:point).permit(:chain_id,:weights,:total_amount,:total_value,
+        :unit,:state,:income,:frequency,:high_value,:high_price)
     end
 end

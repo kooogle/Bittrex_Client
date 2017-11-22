@@ -39,7 +39,12 @@
                 <td><%= item.amount %></td>
                 <td><%= item.price %></td>
                 <td><%= item.total %></td>
-                <td><%= item.stating %><br><%= time_ago_in_words item.updated_at %></td>
+                <td><%= shown_time item.created_at %></td>
+                <td>
+                  <%= item.stating %>
+                  <%= item.frequency_cn %>
+                  <%= item.show_repurchase_cn %>
+                </td>
                 <td>
                   <a href="<%= edit_blocks_order_path(item) %>" class="btn bg-orange btn-flat">
                     <i class="glyphicon glyphicon-edit"></i>
