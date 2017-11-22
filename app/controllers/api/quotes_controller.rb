@@ -140,7 +140,7 @@ private
   def high_analysis(block)
     market = block.market
     point = block.point
-    stock = block.tickers.last[2]
+    stock = block.tickers.last(2).map {|x| x.last_price }
     last_price = stock[-1] #最近半小时报价
     buy_price = market.first['Ask'] #卖出低单价
     sell_price = market.first['Bid'] #买入最高单价
