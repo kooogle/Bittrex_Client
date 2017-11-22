@@ -43,7 +43,7 @@ class Order < ActiveRecord::Base
   end
 
   def show_repurchase_cn
-    return self.repurchase_cn if self.frequency && self.buy?
+    return self.repurchase_cn if self.buy?
   end
 
   def shown_time
