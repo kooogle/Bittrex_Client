@@ -17,7 +17,7 @@ class Api::QuotesController < ApplicationController
     render json:{code:200}
   end
 
-  #每1分钟获取一次最新价格，高频交易
+  #每2分钟获取一次最新价格，高频交易
   def hit_high_markets
     Chain.all.each do |item|
       if item.point && item.point.frequency
@@ -133,6 +133,46 @@ private
   end
 
   def high_analysis(block)
+    market = block.market
+    point = block.point
+    last_price = block.tickers.last.last_price #最近半小时报价
+    buy_price = market.first['Ask'] #卖出低单价
+    sell_price = market.first['Bid'] #买入最高单价
+    money = block.money #可用的有效现金
+    balance = block.balance #持有的区块数
+    low_buy = block.high_buy_business.order(price: :asc).first #当前存在的有效买单
+    high_total_val = block.high_buy_business.map {|x| x.total}.sum
+    if low_buy && sell_price > low_buy.price * 1.015 && balance > 0
+      if balance > low_buy.amount
+        high_sell_chain(block,low_buy.amount,sell_price)
+      else
+        high_sell_chain(block,balance,sell_price)
+      end
+    end
+    if buy_price < last_price && high_total_val > point.high_value && money > point.high_price
+      amount = (point.high_price/buy_price).to_d.round(4,:truncate).to_f
+      high_buy_chain(block,amount,buy_price)
+    end
+  end
+
+  def high_buy_chain(block,amount,price)
+    order = Order.new
+    order.deal = 1
+    order.frequency = true
+    order.chain_id = block.id
+    order.amount = amount
+    order.price = price
+    order.save
+  end
+
+  def high_sell_chain(block,amount,price)
+    order = Order.new
+    order.deal = 0
+    order.frequency = true
+    order.chain_id = block.id
+    order.amount = amount
+    order.price = price
+    order.save
   end
 
 end

@@ -13,7 +13,7 @@
 class Order < ActiveRecord::Base
   belongs_to :chain, class_name:'Chain', foreign_key:'chain_id'
   after_create :calculate_total
-  after_save :sync_remote_order
+  # after_save :sync_remote_order
   scope :latest, -> { order(created_at: :desc)}
 
   self.per_page = 10
@@ -56,7 +56,8 @@ class Order < ActiveRecord::Base
 
   def calculate_total
     if self.total.nil?
-      self.update_attributes(total: self.amount * self.price)
+      total = self.amount * self.price * 0.9975
+      self.update_attributes(total: total.round(2))
     end
   end
 
