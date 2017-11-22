@@ -16,13 +16,13 @@
           <select onchange="javascript:location.href = this.value;" class="form-control" style="display: inline;">
             <option value="?">请选择市场</option>
             <% Chain.all.each do |item|%>
-              <option value="?block=<%= item.id %>&business=<%= params[:business] || '0' %>" <%= 'selected' if params[:block] == item.id.to_s %> ><%= item.markets %></option>
+              <option value="?block=<%= item.id %>&business=<%= params[:business] %>" <%= 'selected' if params[:block] == item.id.to_s %> ><%= item.markets %></option>
             <% end %>
           </select>
         </div>
         <div class="col-sm-3">
           <select onchange="javascript:location.href = this.value;" class="form-control" style="display: inline;">
-            <option value="?">请选择类型</option>
+            <option value="?">请选择交易</option>
               <option value="?block=<%= params[:block] %>&business=1" <%= 'selected' if params[:business] == '1' %> >买入</option>
               <option value="?block=<%= params[:block] %>&business=0" <%= 'selected' if params[:business] == '0' %> >卖出</option>
           </select>
