@@ -140,7 +140,8 @@ private
   def high_analysis(block)
     market = block.market
     point = block.point
-    last_price = block.tickers.last.last_price #最近半小时报价
+    stock = block.tickers.last[2]
+    last_price = stock[-1] #最近半小时报价
     buy_price = market.first['Ask'] #卖出低单价
     sell_price = market.first['Bid'] #买入最高单价
     money = block.money #可用的有效现金
@@ -154,7 +155,7 @@ private
         high_sell_chain(block,balance,sell_price)
       end
     end
-    if buy_price < last_price && high_total_val > point.high_value && money > point.high_price
+    if buy_price < last_price && high_total_val < point.high_value && money > point.high_price && stock[-1] > stock[-2]
       amount = (point.high_price/buy_price).to_d.round(4,:truncate).to_f
       high_buy_chain(block,amount,buy_price)
     end
