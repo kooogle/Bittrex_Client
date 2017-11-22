@@ -79,9 +79,9 @@
       <div class="row">
         <div class="col-sm-5">
           <div class="dataTables_info" id="example1_info" role="status" aria-live="polite">
-            <span>收益：「<%= ((Order.total_sell - Order.total_buy) * 0.9975).round(2) %>」</span>
-            <span>卖出：「<%= Order.total_sell %>」</span>
-            <span>买入：「<%= Order.total_buy %>」</span>
+            <span>收益：「<%= @total_sell - @total_buy %>」</span>
+            <span>卖出：「<%= @total_sell %>」</span>
+            <span>买入：「<%= @total_buy %>」</span>
             <span>条目：「<%= @orders.count %>」</span>
           </div>
         </div>

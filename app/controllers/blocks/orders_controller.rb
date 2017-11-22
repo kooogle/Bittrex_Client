@@ -5,7 +5,9 @@ class Blocks::OrdersController < Blocks::BaseController
     orders = Order.all
     orders = orders.where(deal:params[:business]) if params[:business].present?
     orders = orders.where(chain_id:params[:block]) if params[:block].present?
-    @orders =orders.latest.paginate(page:params[:page])
+    @total_buy = orders.where(deal:1,state:true).map {|x| x.total}.sum.round(2)
+    @total_sell = orders.where(deal:0,state:true).map {|x| x.total}.sum.round(2)
+    @orders = orders.latest.paginate(page:params[:page])
   end
 
   def new
