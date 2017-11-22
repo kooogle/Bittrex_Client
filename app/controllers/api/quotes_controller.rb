@@ -99,7 +99,7 @@ private
   def buy_a_analysis(block,market)
     last_price = market.first['Ask']
     money = block.batch_money
-    if money > 0
+    if money > 1
       amount = (money/last_price).to_d.round(4,:truncate).to_f
       buy_chain(block,amount,last_price) if amount > 0
     end
