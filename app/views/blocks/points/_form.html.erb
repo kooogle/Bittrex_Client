@@ -20,21 +20,21 @@
       </div>
     </div>
     <div class="form-group has-error">
-      <label>总量</label>
-      <div class="input-group">
-        <div class="input-group-addon">
-          <i class="fa fa-pie-chart"></i>
-        </div>
-        <%= f.text_field :total_amount, class:'form-control', placeholder:'（必填* 持有的货币最大数量）' %>
-      </div>
-    </div>
-    <div class="form-group has-error">
-      <label>总值</label>
+      <label>低频总值</label>
       <div class="input-group">
         <div class="input-group-addon">
           <i class="fa fa-cc-mastercard"></i>
         </div>
         <%= f.text_field :total_value, class:'form-control', placeholder:'（必填* 持有量总价值）' %>
+      </div>
+    </div>
+    <div class="form-group has-error">
+      <label>低频单价</label>
+      <div class="input-group">
+        <div class="input-group-addon">
+          <i class="fa fa-pie-chart"></i>
+        </div>
+        <%= f.text_field :low_price, class:'form-control', placeholder:'（必填* 低频，买入单价）' %>
       </div>
     </div>
     <div class="form-group has-error">

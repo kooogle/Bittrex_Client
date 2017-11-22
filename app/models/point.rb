@@ -1,6 +1,6 @@
 # t.integer  "chain_id",     limit: 4
 # t.integer  "weights",      limit: 4
-# t.float    "total_amount", limit: 24
+# t.float    "low_price",    limit: 24
 # t.float    "total_value",  limit: 24
 # t.float    "unit",         limit: 24
 # t.boolean  "state"

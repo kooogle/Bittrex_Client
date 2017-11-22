@@ -20,9 +20,9 @@
             <thead>
             <tr>
               <th tabindex="0" aria-controls="example1" style="text-align: center">区块</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">块量</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">低总价</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">低单价</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">溢价</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">链值</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">高买价</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">高总值</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">状态</th>
@@ -39,9 +39,9 @@
                     <%= item.chain.full_name %>
                   </label>
                 </td>
-                <td><%= item.unit %></td>
-                <td><%= item.income %></td>
                 <td><%= item.total_value %></td>
+                <td><%= item.low_price %></td>
+                <td><%= item.income %></td>
                 <td><%= item.high_price %></td>
                 <td><%= item.high_value %></td>
                 <td>

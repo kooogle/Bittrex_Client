@@ -49,8 +49,8 @@ class Api::StocksController < ApplicationController
   def buy
     block = Chain.find(params[:block])
     ava_money = block.money
-    if ava_money > 0
-      chain_money = block.point.total_value
+    if ava_money > 1
+      chain_money = block.point.low_price
       price = block.market.first['Ask']
       buy_money = ava_money > chain_money ? chain_money : ava_money
       amount = buy_money.to_i / price
@@ -64,7 +64,7 @@ class Api::StocksController < ApplicationController
     block = Chain.find(params[:block])
     balance = block.balance
     if balance > 0
-      chain_money = block.point.total_value
+      chain_money = block.point.low_price
       price = block.market.first['Bid']
       sell_amount = chain_money / price
       amount = balance > sell_amount ? sell_amount : balance

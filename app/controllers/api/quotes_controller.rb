@@ -88,9 +88,9 @@ private
         sell_chain(block,buy.amount,last_price)
       end
     else
-      if last_price > (buy.price + block.income)
+      if last_price > (buy.price + block.income) && balance > 0
         sell_chain(block,balance,last_price)
-      elsif last_price > buy.price * 1.0309
+      elsif last_price > buy.price * 1.0309 && balance > 0
         sell_chain(block,balance,last_price)
       end
     end
@@ -98,8 +98,13 @@ private
 
   def buy_a_analysis(block,market)
     last_price = market.first['Ask']
-    money = block.batch_money
-    if money > 1
+    point = block.point
+    avl_money = block.money #可用的有效现金
+    buy_money = point.low_price
+    total_val = point.total_value
+    had_buy_total = block.low_buy_business.map {|x| x.total}.sum
+    if avl_money > 1 && had_buy_total < total_val
+      money = avl_money > buy_money ? buy_money : avl_money
       amount = (money/last_price).to_d.round(4,:truncate).to_f
       buy_chain(block,amount,last_price) if amount > 0
     end
@@ -176,45 +181,3 @@ private
   end
 
 end
-
-# def buy_analysis(block,market)
-#   last_price = market.first['Ask']
-#   low_price = market.first['Low']
-#   money = block.batch_money
-#   if last_price < block.low && last_price > low_price && money > 0
-#     amount = (money/last_price).to_d.round(4,:truncate).to_f
-#     buy_chain(block,amount,last_price) if amount > 0
-#   elsif block.low_nearby(last_price)
-#     amount = (money/last_price).to_d.round(4,:truncate).to_f
-#     buy_chain(block,point.unit,last_price) if amount > 0
-#   elsif block.kling_down_up_point? && last_price < block.tickers.last.last_price
-#     amount = (money/last_price).to_d.round(4,:truncate).to_f
-#     buy_chain(block,amount,last_price) if amount > 0
-#   end
-# end
-
-# def sell_analysis(block,market)
-#   last_price = market.first['Bid']
-#   high_price = market.first['High']
-#   amount = block.point.unit
-#   balance = block.balance
-#   if last_price > block.greater_income && balance > 0
-#     if last_price > block.high && last_price < high_price
-#       batch_part_sell(block,amount,balance,last_price,0.3)
-#     elsif block.high_nearby(last_price)
-#       batch_part_sell(block,amount,balance,last_price,0.25)
-#     elsif block.kling_up_down_point? && last_price > block.tickers.last.last_price
-#       batch_part_sell(block,amount,balance,last_price,0.2)
-#     end
-#   elsif last_price < block.last_buy_price * 0.9382 && balance > 0
-#     sell_chain(block,balance,last_price)
-#     block.close_merch
-#     User.sms_notice("#{block.block},止损点,价值:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
-#   end
-# end
-
-# def batch_part_sell(block,amount,balance,price,percent)
-#   sell_chain(block,(balance * percent).round(4),price) if (balance * percent).round(4) > amount
-#   sell_chain(block,amount,price) if (balance * percent).round(4) < amount && amount < balance
-#   sell_chain(block,balance,price) if balance < amount
-# end

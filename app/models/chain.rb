@@ -168,19 +168,6 @@ class Chain < ActiveRecord::Base
     false
   end
 
-  def available_money
-    max_buy = self.point.total_value
-    money = self.money
-    return max_buy if money > max_buy
-    money
-  end
-
-  def batch_money
-    money = self.money
-    max_buy = self.point.total_value / 5.0
-    return max_buy > money ? money : max_buy
-  end
-
   def close_merch
     self.point.update_attributes(state:false)
   end
