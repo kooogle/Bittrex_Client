@@ -11,6 +11,7 @@ class Chain < ActiveRecord::Base
   self.per_page = 10
   has_many :tickers, dependent: :destroy
   has_many :business, class_name:'Order'
+  has_many :buy_business,->{where(deal:1,state:true)}, class_name:'Order'
   has_one :point, class_name:'Point'
   has_one :wallet, class_name:'Balance', primary_key:'block', foreign_key:'block'
 

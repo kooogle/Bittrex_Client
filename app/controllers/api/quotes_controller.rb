@@ -46,16 +46,14 @@ private
   #根据 MACD
   def quote_macd_analysis(block)
     market = block.market
-    recent = block.tickers.last(10)
+    recent = block.tickers.last(7)
     macd_diff_last = recent.map {|x| x.macd_diff }
     diff_dea_last = recent.map {|x| x.macd_diff - x.macd_dea }
     if macd_diff_last.min > 0 && macd_diff_last[-1] == macd_diff_last.max
       sell_a_analysis(block,market)
     elsif macd_diff_last.min > 0 && macd_diff_last[-2] == macd_diff_last.max
       sell_b_analysis(block,market)
-    elsif macd_diff_last.min > 0 && diff_dea_last[-1] < 0  && diff_dea_last[-2] > 0
-      sell_c_analysis(block,market)
-    elsif diff_dea_last[-1] < 0  && diff_dea_last[-2] > 0
+    elsif macd_diff_last.max > 0 && diff_dea_last[-1] < 0  && diff_dea_last[-2] > 0
       sell_c_analysis(block,market)
     elsif macd_diff_last.min > 0 && macd_diff_last[-2] == macd_diff_last.max
       buy_a_analysis(block,market)
@@ -63,7 +61,7 @@ private
       buy_a_analysis(block,market)
     elsif macd_diff_last.max < 0 && macd_diff_last[-2] == macd_diff_last.min
       buy_a_analysis(block,market)
-    elsif diff_dea_last[-1] > 0 && diff_dea_last[-2] < 0
+    elsif macd_diff_last.min < 0 && diff_dea_last[-1] > 0 && diff_dea_last[-2] < 0
       buy_a_analysis(block,market)
     end
   end
@@ -71,6 +69,7 @@ private
   def sell_a_analysis(block,market)
     last_price = market.first['Bid']
     balance = block.balance
+    buy_max = block.buy_business.last(7).sort_by {|x| x.price}.last
     if balance > 0 && last_price > block.greater_income
       if  block.high_nearby(last_price)
         sell_chain(block,balance * 0.15,last_price)
@@ -79,26 +78,34 @@ private
       else
         sell_chain(block,balance * 0.1,last_price)
       end
+    elsif balance > 0 && last_price > buy_max.price * 1.02
+      sell_chain(block,buy_max.amount,last_price)
     end
   end
 
   def sell_b_analysis(block,market)
     last_price = market.first['Bid']
     balance = block.balance
+    buy_max = block.buy_business.last(7).sort_by {|x| x.price}.last
     if balance > 0 && last_price > block.greater_income
       if  block.high_nearby(last_price)
         sell_chain(block,balance * 0.2,last_price)
       else
         sell_chain(block,balance * 0.1,last_price)
       end
+    elsif balance > 0 && last_price > buy_max.price * 1.015
+      sell_chain(block,buy_max.amount,last_price)
     end
   end
 
   def sell_c_analysis(block,market)
     last_price = market.first['Bid']
     balance = block.balance
+    buy_max = block.buy_business.last(7).sort_by {|x| x.price}.last
     if balance > 0 && last_price > block.greater_income
-        sell_chain(block,balance,last_price)
+      sell_chain(block,balance,last_price)
+    elsif balance > 0 && last_price > buy_max.price * 1.01
+      sell_chain(block,buy_max.amount,last_price)
     end
   end
 
