@@ -140,24 +140,29 @@ private
   def high_analysis(block)
     market = block.market
     point = block.point
-    stock = block.tickers.last(2).map {|x| x.last_price }
-    last_price = stock[-1] #最近半小时报价
+    stock = block.tickers.last
+    last_price = stock.last_price #最近半小时报价
     buy_price = market.first['Ask'] #卖出低单价
     sell_price = market.first['Bid'] #买入最高单价
     money = block.money #可用的有效现金
     balance = block.balance #持有的区块数
     low_buy = block.high_buy_business.order(price: :asc).first #当前存在的有效买单
     high_total_val = block.high_buy_business.map {|x| x.total}.sum
-    if low_buy && sell_price > low_buy.price * 1.015 && balance > 0
+    if low_buy && sell_price > low_buy.price * 1.02 && balance > 0
       if balance > low_buy.amount
         high_sell_chain(block,low_buy.amount,sell_price)
       else
         high_sell_chain(block,balance,sell_price)
       end
     end
-    if buy_price < last_price && high_total_val < point.high_value && money > point.high_price && stock[-1] > stock[-2]
-      amount = (point.high_price/buy_price).to_d.round(4,:truncate).to_f
-      high_buy_chain(block,amount,buy_price)
+    if buy_price < last_price && high_total_val < point.high_value && money > point.high_price
+      if stock.ma5_price > stock.ma10_price && buy_price * 1.005 < last_price
+        amount = (point.high_price/buy_price).to_d.round(4,:truncate).to_f
+        high_buy_chain(block,amount,buy_price)
+      elsif stock.ma5_price < stock.ma10_price && buy_price * 1.01 < last_price
+        amount = (point.high_price/buy_price).to_d.round(4,:truncate).to_f
+        high_buy_chain(block,amount,buy_price)
+      end
     end
   end
 
