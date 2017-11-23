@@ -82,7 +82,13 @@ class Chain < ActiveRecord::Base
       req.params['nonce'] = timetamp
     end
     result = JSON.parse(res.body)
-    result['result']['Available']
+    availiable = result['result']['Available']
+    self.clear_buy_order if availiable == 0 || availiable.nil?
+    availiable
+  end
+
+  def clear_buy_order
+    self.business.where(repurchase:false,deal:1).destroy_all
   end
 
   def money
