@@ -81,18 +81,9 @@ private
     last_price = market.first['Bid']
     buy = block.low_buy_business.order(price: :asc).first
     balance = block.balance
-    if balance > buy.amount
-      if last_price > (buy.price + block.income)
-        sell_chain(block,buy.amount,last_price)
-      elsif last_price > buy.price * 1.0309
-        sell_chain(block,buy.amount,last_price)
-      end
-    else
-      if last_price > (buy.price + block.income) && balance > 0
-        sell_chain(block,balance,last_price)
-      elsif last_price > buy.price * 1.0309 && balance > 0
-        sell_chain(block,balance,last_price)
-      end
+    if  buy && balance > buy.amount && last_price > (buy.price + block.income)
+      amount = balance > buy.amount ? buy.amount : balance
+      sell_chain(block,buy.amount,last_price)
     end
   end
 
@@ -156,7 +147,7 @@ private
       end
     end
     if buy_price < last_price && high_total_val < point.high_value && money > point.high_price
-      if stock.ma5_price > stock.ma10_price && buy_price * 1.0025 < last_price
+      if stock.ma5_price > stock.ma10_price && buy_price  < last_price * 1.005
         amount = (point.high_price/buy_price).to_d.round(4,:truncate).to_f
         high_buy_chain(block,amount,buy_price)
       elsif stock.ma5_price < stock.ma10_price && buy_price * 1.01 < last_price
