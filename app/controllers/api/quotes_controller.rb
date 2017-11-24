@@ -4,9 +4,11 @@ class Api::QuotesController < ApplicationController
     Chain.all.each do |item|
       item.generate_ticker rescue nil
       extremum_report(item) rescue nil
+      middle_analysis(item) rescue nil
     end
     render json:{code:200}
   end
+
   #每5分钟获取一次最新价格，根据价格涨幅做买卖通知 低频交易
   def hit_markets
     Chain.all.each do |item|
@@ -25,6 +27,12 @@ class Api::QuotesController < ApplicationController
       end
     end
     render json:{code:200}
+  end
+
+  #每天清空一次历史交易记录
+  def hit_clear_business_orders
+    Order.where(deal:1,repurchase:true).destroy_all
+    Order.where(deal:0).destroy_all
   end
 
 private
@@ -54,58 +62,55 @@ private
     end
   end
 
-  #根据 MACD
   def quote_macd_analysis(block)
     market = block.market
+    high_price = market.first['High']
+    low_price = market.first['Low']
+    bid_price = market.first['Bid']
+    ask_price = market.first['Ask']
+    diff_dea_last = recent.map {|x| x.macd_diff - x.macd_dea }
+    if bid_price * 1.01 > high_price && diff_dea_last[-1] > 0
+      sell_quote_market(block,market)
+    elsif ask_price < low_price * 1.01 && diff_dea_last[-1] < 0
+      buy_quote_market(block,market)
+    end
+  end
+
+  #根据 MACD
+  def middle_analysis(block)
+    market = block.market
     recent = block.tickers.last(7)
+    macd_dea_last = recent.map {|x| x.macd_dea }
     macd_diff_last = recent.map {|x| x.macd_diff }
     diff_dea_last = recent.map {|x| x.macd_diff - x.macd_dea }
-    if macd_diff_last.min > 0 && macd_diff_last[-1] == macd_diff_last.max
-      sell_a_analysis(block,market)
-    elsif macd_diff_last.min > 0 && macd_diff_last[-2] == macd_diff_last.max
-      sell_a_analysis(block,market)
-    elsif macd_diff_last.max > 0 && diff_dea_last[-1] < 0  && diff_dea_last[-2] > 0
-      sell_a_analysis(block,market)
-    elsif macd_diff_last.min > 0 && macd_diff_last[-2] == macd_diff_last.max
-      buy_a_analysis(block,market)
-    elsif macd_diff_last.max < 0 && diff_dea_last[-1] > 0 && diff_dea_last[-2] < 0
-      buy_a_analysis(block,market)
-    elsif macd_diff_last.max < 0 && macd_diff_last[-2] == macd_diff_last.min
-      buy_a_analysis(block,market)
-    elsif macd_diff_last.min < 0 && diff_dea_last[-1] > 0 && diff_dea_last[-2] < 0
-      buy_a_analysis(block,market)
+    if macd_diff_last[-2] == macd_diff_last.max && macd_diff_last.min > 0
+      sell_quote_market(block,market)
+    elsif macd_diff_last[-2] == macd_diff_last.min && macd_diff_last[-2] > 0
+      buy_quote_market(block,market)
+    elsif macd_diff_last[-1] > 0 && macd_diff_last[-2] < 0 && macd_diff_last[-1] == macd_diff_last.max
+      buy_quote_market(block,market)
     end
   end
 
-  def sell_a_analysis(block,market)
+  def sell_quote_market(block,market)
     last_price = market.first['Bid']
-    buy = block.low_buy_business.order(price: :asc).first
+    buy = block.low_buy_business.first
     balance = block.balance
-    if balance > buy.amount
-      if last_price > (buy.price + block.income)
-        sell_chain(block,buy.amount,last_price)
-      elsif last_price > buy.price * 1.0309
-        sell_chain(block,buy.amount,last_price)
-      end
-    else
-      if last_price > (buy.price + block.income) && balance > 0
-        sell_chain(block,balance,last_price)
-      elsif last_price > buy.price * 1.0309 && balance > 0
-        sell_chain(block,balance,last_price)
-      end
+    if buy && balance > 0 && last_price > buy.price * 1.005
+      sell_chain(block,buy.amount,last_price)
+    elsif balance > 0
+      sell_chain(block,balance,last_price)
     end
   end
 
-  def buy_a_analysis(block,market)
+  def buy_quote_market(block,market)
     last_price = market.first['Ask']
     point = block.point
     avl_money = block.money #可用的有效现金
-    buy_money = point.low_price
-    total_val = point.total_value
-    had_buy_total = block.low_buy_business.map {|x| x.total}.sum
-    if avl_money > 1 && had_buy_total < total_val
+    buy_money = point.total_value
+    if avl_money > 1
       money = avl_money > buy_money ? buy_money : avl_money
-      amount = (money/last_price).to_d.round(4,:truncate).to_f
+      amount = (money/last_price).to_d.round(5,:truncate).to_f
       buy_chain(block,amount,last_price) if amount > 0
     end
   end

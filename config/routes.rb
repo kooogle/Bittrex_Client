@@ -96,6 +96,7 @@ Rails.application.routes.draw do
     get 'hit_tickers', to:'quotes#hit_tickers'
     get 'hit_markets', to:'quotes#hit_markets'
     get 'hit_high_markets', to:'quotes#hit_high_markets'
+    get 'hit_clear_orders', to:'quotes#hit_clear_business_orders'
     resources :stocks do
       collection do
         get 'quote'

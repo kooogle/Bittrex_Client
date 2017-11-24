@@ -79,8 +79,8 @@ class Order < ActiveRecord::Base
       end
       if result['success']
         self.update_attributes(state:true, result:result['result']['uuid'])
-        self.change_point_profit rescue {} unless self.frequency #低频买卖才同步
         self.sync_repurchase rescue {} if self.sell? #卖出执行回单
+        # self.change_point_profit rescue {} unless self.frequency #低频买卖才同步
         return true
       end
       self.update_attributes(state:false, result:result['message'])
