@@ -85,12 +85,16 @@ private
 
   def sell_quote_market(block,market)
     last_price = market.first['Bid']
-    buy = block.low_buy_business.first
+    buy = block.low_buy_business.order(price: :asc).first
     balance = block.balance
-    if buy && balance > 0 && last_price > buy.price * 1.005
-      sell_chain(block,buy.amount,last_price)
-    elsif balance > 0
-      sell_chain(block,balance,last_price)
+    if buy
+      if balance > 0 && last_price > buy.price * 1.02
+        sell_chain(block,buy.amount,last_price)
+      end
+    else
+      if balance > 0
+        sell_chain(block,balance,last_price)
+      end
     end
   end
 

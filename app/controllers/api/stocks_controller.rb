@@ -63,17 +63,21 @@ class Api::StocksController < ApplicationController
   def sell
     block = Chain.find(params[:block])
     balance = block.balance
-    buy = block.low_buy_business.first
+    buy = block.low_buy_business.order(price: :asc).first
     price = block.market.first['Bid']
-    if buy && balance > 0 && price > buy.price
-      amount = buy.amount
-      sell_chain(block,amount,price)
-    elsif balance > 0
-      chain_money = block.point.total_value
-      sell_amount = chain_money / price
-      amount = balance > sell_amount ? sell_amount : balance
-      amount = amount > 1 ? amount.to_d.round(5,:truncate).to_f : amount.to_d.round(5,:truncate).to_f
-      sell_chain(block,amount,price)
+    if buy
+      if balance > 0 && price > buy.price
+        amount = buy.amount
+        sell_chain(block,amount,price)
+      end
+    else
+      if  balance > 0
+        chain_money = block.point.total_value
+        sell_amount = chain_money / price
+        amount = sell_amount > 1 ? sell_amount.to_d.round(4,:truncate).to_f : sell_amount.to_d.round(5,:truncate).to_f
+        amount = balance > sell_amount ? sell_amount : balance
+        sell_chain(block,amount,price)
+      end
     end
     render json:{code:200}
   end
