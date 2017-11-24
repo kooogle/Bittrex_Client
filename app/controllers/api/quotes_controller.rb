@@ -59,10 +59,11 @@ private
     low_price = market.first['Low']
     bid_price = market.first['Bid']
     ask_price = market.first['Ask']
+    stock = block.tickers.last(2).map {|x| x.last_price }
     diff_dea_last = recent.map {|x| x.macd_diff - x.macd_dea }
-    if bid_price * 1.01 > high_price && diff_dea_last[-1] > 0
+    if bid_price * 1.01 > high_price && diff_dea_last[-1] > 0 && stock[-1] > stock[-2]
       sell_quote_market(block,market)
-    elsif ask_price < low_price * 1.01 && diff_dea_last[-1] < 0
+    elsif ask_price < low_price * 1.01 && diff_dea_last[-1] < 0 && stock[-1] > stock[-2]
       buy_quote_market(block,market)
     end
   end
