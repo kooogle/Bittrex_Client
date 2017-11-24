@@ -87,30 +87,39 @@
   });
   var ctx1 = document.getElementById("myMacd").getContext('2d');
   var myLineChart1 = new Chart(ctx1, {
-      type: 'line',
-      data: {
-        labels: <%= raw @date_array %>,
-        datasets: [
+    type: 'line',
+    data: {
+      labels: <%= raw @date_array %>,
+      datasets: [
+      {
+          label: "DIF 线",
+          data: <%= @macd_diff.compact %>,
+          fill: false,
+          pointRadius: 0,
+          backgroundColor: 'rgba(27,129,62,0.2)',
+          borderColor: 'rgba(27,129,62, 1)',
+          lineTension: 0.15
+        },
         {
-            label: "DIF 线",
-            data: <%= @macd_diff.compact %>,
-            fill: false,
-            pointRadius: 0,
-            backgroundColor: 'rgba(27,129,62,0.2)',
-            borderColor: 'rgba(27,129,62, 1)',
-            lineTension: 0.15
-          },
-          {
-            label: "DEA 线",
-            data: <%= @macd_dea.compact %>,
-            fill: true,
-            pointRadius: 0,
-            backgroundColor: 'rgba(203, 27, 69,0.2)',
-            borderColor: 'rgba(203, 27, 69, 1)',
-            lineTension: 0.15
-          }
-        ]
-      },
-      options: {duration: 200}
+          label: "DEA 线",
+          data: <%= @macd_dea.compact %>,
+          fill: false,
+          pointRadius: 0,
+          backgroundColor: 'rgba(203, 27, 69,0.2)',
+          borderColor: 'rgba(203, 27, 69, 1)',
+          lineTension: 0.15
+        },
+        {
+          label: "BAR 线",
+          data: <%= @macd_bar.compact %>,
+          fill: true,
+          pointRadius: 0,
+          backgroundColor: 'rgba(102, 102, 102,0.2)',
+          borderColor: 'rgba(102, 102, 102, 1)',
+          lineTension: 0.15
+        }
+      ]
+    },
+    options: {duration: 200}
   });
 </script>

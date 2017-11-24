@@ -4,7 +4,9 @@ class Api::QuotesController < ApplicationController
     Chain.all.each do |item|
       item.generate_ticker rescue nil
       extremum_report(item) rescue nil
-      middle_analysis(item) rescue nil
+      if item.point && item.point.state
+        middle_analysis(item) rescue nil
+      end
     end
     render json:{code:200}
   end
