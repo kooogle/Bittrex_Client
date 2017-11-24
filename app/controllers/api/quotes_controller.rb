@@ -51,17 +51,6 @@ private
     User.sms_yunpian(string)
   end
 
-  def quote_analysis(block)
-    market = block.market
-    ma5_price = block.tickers.last.ma5_price
-    ma10_price = block.tickers.last.ma10_price
-    if ma5_price > ma10_price
-      sell_analysis(block,market)
-    elsif ma5_price < ma10_price
-      buy_analysis(block,market)
-    end
-  end
-
   def quote_macd_analysis(block)
     market = block.market
     high_price = market.first['High']
@@ -161,7 +150,7 @@ private
       end
     end
     if buy_price < last_price && high_total_val < point.high_value && money > point.high_price
-      if stock.ma5_price > stock.ma10_price && buy_price * 1.0025 < last_price
+      if stock.ma5_price > stock.ma10_price && buy_price  < last_price * 1.005
         amount = (point.high_price/buy_price).to_d.round(4,:truncate).to_f
         high_buy_chain(block,amount,buy_price)
       elsif stock.ma5_price < stock.ma10_price && buy_price * 1.01 < last_price
