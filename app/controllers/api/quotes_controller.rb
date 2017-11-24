@@ -88,7 +88,7 @@ private
     buy = block.low_buy_business.order(price: :asc).first
     balance = block.balance
     if buy
-      if balance > 0 && last_price > buy.price * 1.02
+      if balance > 0 && last_price > buy.price * 1.05
         sell_chain(block,buy.amount,last_price)
       end
     else

@@ -71,7 +71,7 @@ class Api::StocksController < ApplicationController
         sell_chain(block,amount,price)
       end
     else
-      if  balance > 0
+      if balance > 0
         chain_money = block.point.total_value
         sell_amount = chain_money / price
         amount = sell_amount > 1 ? sell_amount.to_d.round(4,:truncate).to_f : sell_amount.to_d.round(5,:truncate).to_f
