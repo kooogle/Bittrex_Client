@@ -74,11 +74,9 @@ private
     macd_dea_last = recent.map {|x| x.macd_dea }
     macd_diff_last = recent.map {|x| x.macd_diff }
     diff_dea_last = recent.map {|x| x.macd_diff - x.macd_dea }
-    if macd_diff_last[-2] == macd_diff_last.max && macd_diff_last.min > 0
+    if diff_dea_last[-1] < 0 && diff_dea_last[-2] > 0 && diff_dea_last[0..-2].min > 0
       sell_quote_market(block,market)
-    elsif macd_diff_last[-2] == macd_diff_last.min && macd_diff_last[-2] > 0
-      buy_quote_market(block,market)
-    elsif macd_diff_last[-1] > 0 && macd_diff_last[-2] < 0 && macd_diff_last[-1] == macd_diff_last.max
+    elsif diff_dea_last[-1] > 0 && macd_diff_last[-2] < 0 && diff_dea_last[0..-2].max < 0
       buy_quote_market(block,market)
     end
   end
