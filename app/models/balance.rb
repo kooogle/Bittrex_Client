@@ -42,4 +42,12 @@ class Balance < ActiveRecord::Base
     result = JSON.parse(res.body)['result']
   end
 
+  def worth
+    if self.chain
+      self.balance * self.chain.market.first['Bid']
+    else
+      self.balance
+    end
+  end
+
 end
