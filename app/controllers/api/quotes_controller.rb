@@ -133,7 +133,7 @@ private
   def extremum_report(block)
     quotes = block.tickers.last(48)
     td_quotes = quotes.map {|x| x.last_price}
-    macd_quotes = quotes.map {|x| x.macd_diff - macd_dea}
+    macd_quotes = quotes.map {|x| x.macd_diff - x.macd_dea}
     if work_time?
       if td_quotes.max == td_quotes[-1]
         User.sms_batch("#{block.block},行情最高点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
