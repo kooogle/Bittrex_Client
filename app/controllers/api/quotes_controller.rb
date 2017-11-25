@@ -199,7 +199,7 @@ private
 
   def work_time?
     current = Time.now.strftime('%H').to_i
-    return true if current < 22 || current > 10
+    return true if current < 22 || current > 9
     false
   end
 
