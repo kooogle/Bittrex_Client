@@ -44,9 +44,9 @@ class Balance < ActiveRecord::Base
 
   def worth
     if self.chain
-      self.balance * self.chain.market.first['Bid']
+      self.balance.to_f  * self.chain.market.first['Bid']
     else
-      self.balance
+      self.balance.to_f
     end
   end
 
