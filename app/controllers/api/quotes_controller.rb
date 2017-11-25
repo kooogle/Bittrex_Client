@@ -130,11 +130,20 @@ private
   end
 
   def extremum_report(block)
-    td_quotes = block.tickers.last(48).map {|x| x.last_price}
-    if td_quotes.max == td_quotes[-1]
-      User.sms_batch("#{block.block},行情最高点,价值:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
-    elsif td_quotes.min == td_quotes[-1]
-      User.sms_batch("#{block.block},行情最低点,价值:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
+    quotes = block.tickers.last(48)
+    td_quotes = quotes.map {|x| x.last_price}
+    macd_quotes = quotes.map {|x| x.macd_diff - macd_dea}
+    if work_time?
+      if td_quotes.max == td_quotes[-1]
+        User.sms_batch("#{block.block},行情最高点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
+      elsif td_quotes.min == td_quotes[-1]
+        User.sms_batch("#{block.block},行情最低点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
+      end
+      if macd_quotes[-1] > 0 && macd_quotes[-2] < 0
+        User.sms_notice("#{block.block},上涨金叉点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
+      elsif macd_quotes[-1] < 0 && macd_quotes[-2] > 0
+        User.sms_notice("#{block.block},下跌死叉点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
+      end
     end
   end
 
@@ -185,6 +194,12 @@ private
     order.amount = amount
     order.price = price
     order.save
+  end
+
+  def work_time?
+    current = Time.now.strftime('%H').to_i
+    return true if current < 22 || current > 10
+    false
   end
 
 end
