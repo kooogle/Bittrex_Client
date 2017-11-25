@@ -5,7 +5,7 @@ class Api::QuotesController < ApplicationController
       item.generate_ticker rescue nil
       extremum_report(item) rescue nil
       if item.point && item.point.state
-        middle_analysis(item) rescue nil
+        middle_analysis(item)
       end
     end
     render json:{code:200}
@@ -59,6 +59,7 @@ private
     low_price = market.first['Low']
     bid_price = market.first['Bid']
     ask_price = market.first['Ask']
+    recent = block.tickers.last(7)
     stock = block.tickers.last(2).map {|x| x.last_price }
     diff_dea_last = recent.map {|x| x.macd_diff - x.macd_dea }
     if stock[-1] > stock[-2]
