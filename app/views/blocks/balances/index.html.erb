@@ -57,7 +57,7 @@
       </div>
       <div class="row">
         <div class="col-sm-5">
-          <div class="dataTables_info" id="example1_info" role="status" aria-live="polite"><h5>价值总数：$ <%= @balances.map { |x| x.balance }.sum.round(2) %></h5></div>
+          <div class="dataTables_info" id="example1_info" role="status" aria-live="polite"><h5>价值总数：$ <%= @balances.map { |x| x.balance }.sum %></h5></div>
         </div>
         <div class="col-sm-12">
           <div class="dataTables_paginate paging_simple_numbers">
