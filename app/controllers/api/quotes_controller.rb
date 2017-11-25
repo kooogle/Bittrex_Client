@@ -3,7 +3,7 @@ class Api::QuotesController < ApplicationController
   def hit_tickers
     Chain.all.each do |item|
       item.generate_ticker rescue nil
-      extremum_report(item) rescue nil
+      extremum_report(item)
       if item.point && item.point.state
         middle_analysis(item)
       end
@@ -142,8 +142,6 @@ private
       end
       if macd_quotes[-1] > 0 && macd_quotes[-2] < 0
         User.sms_notice("#{block.block},上涨金叉点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
-      elsif macd_quotes[-1] < 0 && macd_quotes[-2] > 0
-        User.sms_notice("#{block.block},下跌死叉点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
       end
     end
   end
@@ -199,7 +197,7 @@ private
 
   def work_time?
     current = Time.now.strftime('%H').to_i
-    return true if current < 22 || current > 9
+    return true if current < 22 || current > 10
     false
   end
 

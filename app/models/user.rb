@@ -29,7 +29,7 @@ class User < ActiveRecord::Base
   end
 
   def self.sms_notice(content)
-    mobiles = '18211109527'
+    mobile = '18211109527'
     User.sms_yunpian(mobile,content)
   end
 
