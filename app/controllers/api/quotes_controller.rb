@@ -90,7 +90,7 @@ private
     buy = block.low_buy_business.order(price: :asc).first
     balance = block.balance
     if buy
-      if balance > 0 && last_price > buy.price * 1.05
+      if balance > 0 && last_price > buy.price * 1.0618
         sell_chain(block,buy.amount,last_price)
       end
     else
@@ -134,11 +134,11 @@ private
     quotes = block.tickers.last(48)
     td_quotes = quotes.map {|x| x.last_price}
     macd_quotes = quotes.map {|x| x.macd_diff - x.macd_dea}
-    if work_time?
+    if work_time? && quotes.size == 48
       if td_quotes.max == td_quotes[-1]
-        User.sms_batch("#{block.block},行情最高点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
+        User.sms_notice("#{block.block},行情最高点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
       elsif td_quotes.min == td_quotes[-1]
-        User.sms_batch("#{block.block},行情最低点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
+        User.sms_notice("#{block.block},行情最低点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
       end
       if macd_quotes[-1] > 0 && macd_quotes[-2] < 0
         User.sms_notice("#{block.block},上涨金叉点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
