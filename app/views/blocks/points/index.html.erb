@@ -26,7 +26,6 @@
               <th tabindex="0" aria-controls="example1" style="text-align: center">高买价</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">高总值</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">状态</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">频率</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center;">操作</th>
             </tr>
             </thead>
@@ -46,9 +45,6 @@
                 <td><%= item.high_value %></td>
                 <td>
                   <input type="checkbox" name="my-state" <%= 'checked' if item.state %> onchange='switch_state(<%= item.id %>)'>
-                </td>
-                <td>
-                  <input type="checkbox" name="my-frequency" <%= 'checked' if item.frequency %> onchange='frequency_state(<%= item.id %>)'>
                 </td>
                 <td>
                   <a href="<%= edit_blocks_point_path(item) %>" class="btn bg-orange btn-flat">
@@ -82,10 +78,6 @@
     function switch_state(item) {
       $.get('/blocks/points/' + item +'/change_state');
     }
-    function frequency_state(item) {
-      $.get('/blocks/points/' + item +'/change_frequency');
-    }
     $("[name='my-state']").bootstrapSwitch({onColor:'success',offColor:'danger'});
-    $("[name='my-frequency']").bootstrapSwitch({onColor:'danger',offColor:'primary',onText:'高频',offText:'低频'});
   </script>
 <% end %>
