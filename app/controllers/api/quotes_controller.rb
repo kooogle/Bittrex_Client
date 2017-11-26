@@ -134,7 +134,7 @@ private
     quotes = block.tickers.last(48)
     td_quotes = quotes.map {|x| x.last_price}
     macd_quotes = quotes.map {|x| x.macd_diff - x.macd_dea}
-    if work_time? && quotes.size == 48
+    if work_time && quotes.size == 48
       if td_quotes.max == td_quotes[-1]
         User.sms_notice("#{block.block},行情最高点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
       elsif td_quotes.min == td_quotes[-1]
@@ -195,7 +195,7 @@ private
     order.save
   end
 
-  def work_time?
+  def work_time
     current = Time.now.strftime('%H').to_i
     return true if current < 22 || current > 10
     false
