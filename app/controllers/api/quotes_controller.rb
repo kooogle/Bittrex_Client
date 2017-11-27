@@ -165,15 +165,15 @@ private
     quotes = block.tickers.last(48)
     td_quotes = quotes.map {|x| x.last_price}
     macd_quotes = quotes.map {|x| x.macd_diff - x.macd_dea}
-    if work_time && quotes.size == 48
-      if td_quotes.max == td_quotes[-1]
-        User.sms_notice("#{block.block},行情最高点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
-      elsif td_quotes.min == td_quotes[-1]
-        User.sms_notice("#{block.block},行情最低点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
-      end
-      if macd_quotes[-1] > 0 && macd_quotes[-2] < 0
-        User.sms_notice("#{block.block},上涨金叉点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
-      end
+    if td_quotes.max == td_quotes[-1]
+      chain_up_notice(block)
+      # User.sms_notice("#{block.block},行情最高点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
+    elsif td_quotes.min == td_quotes[-1]
+      chain_down_notice(block)
+      # User.sms_notice("#{block.block},行情最低点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
+    end
+    if macd_quotes[-1] > 0 && macd_quotes[-2] < 0
+      User.sms_notice("#{block.block},上涨金叉点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
     end
   end
 
@@ -201,6 +201,18 @@ private
     current = Time.now.strftime('%H').to_i
     return true if  current > 9 && current < 22
     nil
+  end
+
+  def chain_up_notice(block)
+    title = "#{block.block} 价格上涨"
+    desp = "价格：$#{block.tickers.last.last_price}；时间：Time.now.strftime('%H:%M')"
+    User.wechat_notice(title,desp)
+  end
+
+  def chain_down_notice(block)
+    title = "#{block.block} 价格下跌"
+    desp = "价格：$#{block.tickers.last.last_price}；时间：Time.now.strftime('%H:%M')"
+    User.wechat_notice(title,desp)
   end
 
 end

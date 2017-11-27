@@ -45,4 +45,14 @@ class User < ActiveRecord::Base
     end
   end
 
+  def self.wechat_notice(title,content)
+    push_url = 'https://pushbear.ftqq.com/sub'
+    res = Faraday.get do |req|
+      req.url push_url
+      req.params['sendkey'] = '1525-8b323372634c1cbd4f575e1628802149'
+      req.params['text'] = title
+      req.params['desp'] = content
+    end
+  end
+
 end
