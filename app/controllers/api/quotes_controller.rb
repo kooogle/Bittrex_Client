@@ -125,7 +125,7 @@ private
     avl_money = block.money
     buy_money = point.high_price
     total_money = point.high_value
-    had_total = block.high_buy_business.map {|x| x.high_value}.sum
+    had_total = block.high_buy_business.map {|x| x.total}.sum
     if avl_money > 1 && had_total < total_money
       money = avl_money > buy_money ? buy_money : avl_money
       amount = (money/last_price).to_d.round(4,:truncate).to_f
