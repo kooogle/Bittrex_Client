@@ -137,7 +137,7 @@ private
     last_price = market.first['Bid']
     buy = block.high_buy_business.first
     balance = block.balance
-    if buy && balance > 0 && last_price > buy.price * 1.02
+    if buy && balance > 0
       amount = balance > buy.amount ? buy.amount : balance
       high_sell_chain(block,amount,last_price)
     end
