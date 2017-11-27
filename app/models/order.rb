@@ -169,9 +169,9 @@ class Order < ActiveRecord::Base
 
   def sync_repurchase
     if self.frequency
-      self.chain.high_buy_business.order(price: :asc).first.update_attributes(repurchase:true)
+      self.chain.high_buy_business.first.update_attributes(repurchase:true)
     else
-      self.chain.low_buy_business.order(price: :asc).first.update_attributes(repurchase:true)
+      self.chain.low_buy_business.first.update_attributes(repurchase:true)
     end
   end
 
