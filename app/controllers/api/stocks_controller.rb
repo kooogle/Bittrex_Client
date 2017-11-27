@@ -7,7 +7,7 @@ class Api::StocksController < ApplicationController
     tickers = chain.tickers.last(amount.to_i)
     render json:{
       avg_price:avg_price(tickers.map{|x| x.last_price}),
-      time: tickers.map{|x| x.created_at.strftime('%d-%H')},
+      time: tickers.map{|x| x.created_at.strftime('%H:%M')},
       price: tickers.map{|x| x.last_price},
       ma5_price: tickers.map{|x| x.ma5_price},
       ma10_price: tickers.map{|x| x.ma10_price},
@@ -63,21 +63,16 @@ class Api::StocksController < ApplicationController
   def sell
     block = Chain.find(params[:block])
     balance = block.balance
-    buy = block.low_buy_business.order(price: :asc).first
+    buy = block.low_buy_business.first
+    buy = block.high_buy_business.first if buy.nil?
     price = block.market.first['Bid']
-    if buy
-      if balance > 0 && price > buy.price
-        amount = buy.amount
-        sell_chain(block,amount,price)
+    if balance > 0
+      if buy
+        amount = balance > buy.amount ? buy.amount : balance
+      else
+        amount = balance
       end
-    else
-      if balance > 0
-        chain_money = block.point.total_value
-        sell_amount = chain_money / price
-        amount = sell_amount > 1 ? sell_amount.to_d.round(4,:truncate).to_f : sell_amount.to_d.round(5,:truncate).to_f
-        amount = balance > sell_amount ? sell_amount : balance
-        sell_chain(block,amount,price)
-      end
+      sell_chain(block,amount,price)
     end
     render json:{code:200}
   end
