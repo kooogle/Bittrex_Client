@@ -65,9 +65,9 @@ private
     diff_dea_last = recent.map {|x| x.macd_diff - x.macd_dea }
     if stock[-1] > stock[-2]
       if bid_price * 1.01 > high_price && diff_dea_last[-1] > 0
-        sell_quote_market(block,market)
+        sell_macd_market(block,market)
       elsif ask_price < low_price * 1.01 && diff_dea_last[-1] < 0
-        buy_quote_market(block,market)
+        buy_macd_market(block,market)
       end
     end
   end
@@ -75,13 +75,11 @@ private
   #根据 MACD
   def middle_macd_business(block)
     market = block.market
-    recent = block.tickers.last(7)
-    macd_dea_last = recent.map {|x| x.macd_dea }
-    macd_diff_last = recent.map {|x| x.macd_diff }
+    recent = block.tickers.last(5)
     diff_dea_last = recent.map {|x| x.macd_diff - x.macd_dea }
     if diff_dea_last[-1] < 0 && diff_dea_last[-2] > 0 && diff_dea_last[0..-2].min > 0
       sell_macd_market(block,market)
-    elsif diff_dea_last[-1] > 0 && macd_diff_last[-2] < 0 && diff_dea_last[0..-2].max < 0
+    elsif diff_dea_last[-1] > 0 && diff_dea_last[-2] < 0 && diff_dea_last[0..-2].max < 0
       buy_macd_market(block,market)
     end
   end
@@ -90,7 +88,7 @@ private
     last_price = market.first['Bid']
     buy = block.low_buy_business.first
     balance = block.balance
-    if buy && balance > 0 && last_price > buy.price * 1.03
+    if buy && balance > 0 && last_price > buy.price * 1.02
       amount = balance > buy.amount ? buy.amount : balance
       sell_chain(block,amount,last_price)
     end
@@ -111,14 +109,14 @@ private
   end
 
   def middle_ma_business(block)
-     market = block.market
-     recent = block.tickers.last(7)
-     ma_diff = recent.map {|x| x.ma5_price - x.ma10_price }
-     if ma_diff[-1] > 0 && diff_dea_last[-2]  < 0
-        buy_ma_market(block,market)
-     elsif  ma_diff[-1] < 0 && diff_dea_last[-2]  > 0
-        sell_ma_market(block,market)
-      end
+    market = block.market
+    recent = block.tickers.last(4)
+    ma_diff = recent.map {|x| x.ma5_price - x.ma10_price }
+    if ma_diff[-1] > 0 && ma_diff[-2] < 0 && ma_diff[0] < 0
+      buy_ma_market(block,market)
+    elsif  ma_diff[-1] < 0 && ma_diff[-2] > 0 && ma_diff[0] > 0
+      sell_ma_market(block,market)
+    end
   end
 
   def buy_ma_market(block,market)
