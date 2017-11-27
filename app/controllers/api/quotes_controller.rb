@@ -130,7 +130,7 @@ private
       money = avl_money > buy_money ? buy_money : avl_money
       amount = (money/last_price).to_d.round(4,:truncate).to_f
       high_buy_chain(block,amount,last_price) if amount > 0
-    elsif avl_money > 1 && had_total > total_money
+    elsif avl_money > 1 && had_total > total_money && work_time
       User.sms_notice("#{block.block},MA上涨点,价格:#{last_price} #{block.currency},请考虑是否加仓")
     end
   end
@@ -142,7 +142,7 @@ private
     if buy && balance > 0 && last_price > buy.price * 1.01
       amount = balance > buy.amount ? buy.amount : balance
       high_sell_chain(block,amount,last_price)
-    elsif buy && last_price < buy.price
+    elsif buy && last_price < buy.price && work_time
       User.sms_notice("#{block.block},MA下跌点,价格:#{last_price} #{block.currency},低于成本价#{buy.price}，请考虑是否空仓")
     end
   end
@@ -175,10 +175,6 @@ private
     elsif td_quotes.min == td_quotes[-1]
       chain_down_notice(block)
     end
-    if macd_quotes[-1] > 0 && macd_quotes[-2] < 0
-      User.sms_notice("#{block.block},上涨金叉点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
-    end
-
   end
 
   def high_buy_chain(block,amount,price)
