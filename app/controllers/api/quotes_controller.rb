@@ -88,7 +88,7 @@ private
     last_price = market.first['Bid']
     buy = block.low_buy_business.first
     balance = block.balance
-    if buy && balance > 0 && last_price > buy.price * 1.02
+    if buy && balance > 0 && last_price > buy.price * 1.01
       amount = balance > buy.amount ? buy.amount : balance
       sell_chain(block,amount,last_price)
     end
@@ -110,11 +110,11 @@ private
 
   def middle_ma_business(block)
     market = block.market
-    recent = block.tickers.last(4)
+    recent = block.tickers.last(2)
     ma_diff = recent.map {|x| x.ma5_price - x.ma10_price }
-    if ma_diff[-1] > 0 && ma_diff[-2] < 0 && ma_diff[0] < 0
+    if ma_diff[-1] > 0 && ma_diff[-2]
       buy_ma_market(block,market)
-    elsif  ma_diff[-1] < 0 && ma_diff[-2] > 0 && ma_diff[0] > 0
+    elsif  ma_diff[-1] < 0 && ma_diff[-2]
       sell_ma_market(block,market)
     end
   end
@@ -130,6 +130,8 @@ private
       money = avl_money > buy_money ? buy_money : avl_money
       amount = (money/last_price).to_d.round(4,:truncate).to_f
       high_buy_chain(block,amount,last_price) if amount > 0
+    elsif avl_money > 1 && had_total > total_money
+      User.sms_notice("#{block.block},MA上涨点,价格:#{last_price} #{block.currency},请考虑是否加仓")
     end
   end
 
@@ -137,9 +139,11 @@ private
     last_price = market.first['Bid']
     buy = block.high_buy_business.first
     balance = block.balance
-    if buy && balance > 0
+    if buy && balance > 0 && last_price > buy.price * 1.01
       amount = balance > buy.amount ? buy.amount : balance
       high_sell_chain(block,amount,last_price)
+    elsif buy && last_price < buy.price
+      User.sms_notice("#{block.block},MA下跌点,价格:#{last_price} #{block.currency},低于成本价#{buy.price}，请考虑是否空仓")
     end
   end
 
@@ -163,18 +167,18 @@ private
 
   def extremum_report(block)
     quotes = block.tickers.last(48)
+    ma_diff = quotes[-2..-1].map {|x| x.ma5_price - x.ma10_price}
     td_quotes = quotes.map {|x| x.last_price}
     macd_quotes = quotes.map {|x| x.macd_diff - x.macd_dea}
     if td_quotes.max == td_quotes[-1]
       chain_up_notice(block)
-      # User.sms_notice("#{block.block},行情最高点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
     elsif td_quotes.min == td_quotes[-1]
       chain_down_notice(block)
-      # User.sms_notice("#{block.block},行情最低点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
     end
     if macd_quotes[-1] > 0 && macd_quotes[-2] < 0
       User.sms_notice("#{block.block},上涨金叉点,价格:#{td_quotes[-1]} #{block.currency},时间:#{Time.now.strftime('%H:%M')}")
     end
+
   end
 
   def high_buy_chain(block,amount,price)
