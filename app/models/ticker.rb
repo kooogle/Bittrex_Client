@@ -15,9 +15,8 @@
 class Ticker < ActiveRecord::Base
   after_save :sync_ma_price
   after_save :sync_macd
-
-  self.per_page = 15
   scope :latest, ->{ order(created_at: :desc)}
+  self.per_page = 15
 
   def sync_ma_price
     if self.ma5_price.nil?
@@ -27,7 +26,7 @@ class Ticker < ActiveRecord::Base
 
   def recent_ema(number)
     ema_array = Ticker.where('id <= ? and chain_id = ?',self.id,self.chain_id).last(number).map {|x| x.last_price }
-    average = (ema_array.sum / number).round(8)
+    average = (ema_array.sum / ema_array.size).round(8)
   end
 
   def sync_macd
@@ -44,21 +43,21 @@ class Ticker < ActiveRecord::Base
       last_price = self.last_price
       ema_fast = pre_block.macd_fast
       ema_slow = pre_block.macd_slow
-      ema_dem = pre_block.macd_dea
+      ema_dea = pre_block.macd_dea
       fast_val =  last_price * 2 / (fast+1) + ema_fast * (fast - 2) / (fast + 1)
       slow_val =  last_price * 2 / (slow+1) + ema_slow * (slow - 2) / (slow + 1)
       diff_val = fast_val - slow_val
-      dem_val =  diff_val * 2 / (signal + 1) + ema_dem *(signal - 2) / (signal + 1)
-      bar_val = 2 * (diff_val - dem_val)
+      dea_val =  diff_val * 2 / (signal + 1) + ema_dea *(signal - 2) / (signal + 1)
+      bar_val = 2 * (diff_val - dea_val)
     else
       last_price = self.last_price
       fast_val =  last_price * 2 / (fast+1)
       slow_val =  last_price * 2 / (slow+1)
       diff_val = fast_val - slow_val
-      dem_val =  diff_val * 2 / (signal + 1)
-      bar_val = 2 * (diff_val - dem_val)
+      dea_val =  diff_val * 2 / (signal + 1)
+      bar_val = 2 * (diff_val - dea_val)
     end
-    return [fast_val,slow_val,diff_val,dem_val,bar_val]
+    return [fast_val,slow_val,diff_val,dea_val,bar_val]
   end
 
 end
