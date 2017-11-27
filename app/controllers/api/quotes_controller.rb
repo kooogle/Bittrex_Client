@@ -205,13 +205,13 @@ private
 
   def chain_up_notice(block)
     title = "#{block.block} 价格上涨"
-    desp = "价格：$#{block.tickers.last.last_price}；时间：Time.now.strftime('%H:%M')"
+    desp = "价格: #{block.tickers.last.last_price} USDT, 时间: #{Time.now.strftime('%F %T')}"
     User.wechat_notice(title,desp)
   end
 
   def chain_down_notice(block)
     title = "#{block.block} 价格下跌"
-    desp = "价格：$#{block.tickers.last.last_price}；时间：Time.now.strftime('%H:%M')"
+    desp = "价格: #{block.tickers.last.last_price} USDT, 时间: #{Time.now.strftime('%F %T')}"
     User.wechat_notice(title,desp)
   end
 
