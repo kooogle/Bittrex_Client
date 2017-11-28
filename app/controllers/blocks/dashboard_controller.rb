@@ -12,7 +12,7 @@ class Blocks::DashboardController < Blocks::BaseController
     @last_price = tickers.map {|x| x.last_price }
     @macd_diff = tickers.map {|x| x.macd_diff}
     @macd_dea = tickers.map {|x| x.macd_dea}
-    @macd_bar = tickers.map {|x| x.macd_bar}
+    @ma_diff = tickers.map {|x| x.ma5_price - x.ma10_price}
   end
 
   def pending

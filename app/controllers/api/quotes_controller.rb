@@ -217,7 +217,7 @@ private
   def full_chain_notice(block)
     title = "#{block.block} 加仓通知"
     content = "#{block.block}位于 MA 上涨点，价格:#{block.tickers.last.last_price} USDT,
-    买入价格：#{block.buy_business.first.buy.price},
+    买入价格：#{block.buy_business.first.price},
     持有数量：#{block.buy_business.map {|x| x.amount }.sum},
     本金数额：#{block.buy_business.map {|x| x.total }.sum}"
     User.wechat_notice(title,content)
@@ -226,7 +226,7 @@ private
   def empty_chain_notice(block)
     title = "#{block.block} 空仓通知"
     content = "#{block.block}位于 MA 下跌点，价格:#{block.tickers.last.last_price} USDT,
-    买入价格：#{block.buy_business.first.buy.price},
+    买入价格：#{block.buy_business.first.price},
     持有数量：#{block.buy_business.map {|x| x.amount }.sum},
     本金数额：#{block.buy_business.map {|x| x.total }.sum}"
     User.wechat_notice(title,content)

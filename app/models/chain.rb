@@ -5,7 +5,7 @@
 # t.datetime "updated_at", null: false
 
 class Chain < ActiveRecord::Base
-  scope :named, ->{ order(block: :asc)}
+  scope :named, ->{ order(block: :asc) }
   validates_presence_of :block, :currency, :label
   validates_uniqueness_of :block, scope: :currency
   self.per_page = 10
@@ -19,6 +19,19 @@ class Chain < ActiveRecord::Base
 
   def full_name
     "#{self.block}-#{self.currency}"
+  end
+
+  def buy_cost
+    cost = self.buy_business.map {|x| x.total }.sum
+    return cost.round(2) if cost > 0
+    '--'
+  end
+
+  def buy_price
+    buy_business = self.buy_business
+    price = buy_business.map {|x| x.total }.sum / buy_business.map {|x| x.amount }.sum
+    return price.round(2) if price > 0
+    '--'
   end
 
   def to_cny
