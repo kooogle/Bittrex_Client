@@ -29,8 +29,10 @@ class Chain < ActiveRecord::Base
 
   def buy_price
     buy_business = self.buy_business
-    price = buy_business.map {|x| x.total }.sum / buy_business.map {|x| x.amount }.sum
-    return price.round(2) if price > 0
+    if buy_business.count > 0
+      price = buy_business.map {|x| x.total }.sum / buy_business.map {|x| x.amount }.sum
+      return price.round(2)
+    end
     '--'
   end
 
