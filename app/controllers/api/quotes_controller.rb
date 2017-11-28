@@ -6,7 +6,6 @@ class Api::QuotesController < ApplicationController
       extremum_report(item)
       if item.point && item.point.state
         middle_ma_business(item)
-        middle_macd_business(item)
       end
     end
     render json:{code:200}
@@ -130,8 +129,8 @@ private
       money = avl_money > buy_money ? buy_money : avl_money
       amount = (money/last_price).to_d.round(4,:truncate).to_f
       high_buy_chain(block,amount,last_price) if amount > 0
-    elsif avl_money > 1 && had_total > total_money && work_time
-      User.sms_notice("#{block.block},MA上涨点,价格:#{last_price} #{block.currency},请考虑是否加仓")
+    elsif avl_money > 1 && had_total > total_money
+      full_chain_notice(block)
     end
   end
 
@@ -142,8 +141,8 @@ private
     if buy && balance > 0 && last_price > buy.price * 1.01
       amount = balance > buy.amount ? buy.amount : balance
       high_sell_chain(block,amount,last_price)
-    elsif buy && last_price < buy.price && work_time
-      User.sms_notice("#{block.block},MA下跌点,价格:#{last_price} #{block.currency},低于成本价#{buy.price}，请考虑是否空仓")
+    elsif buy && last_price < buy.price
+      empty_chain_notice(block)
     end
   end
 
@@ -206,13 +205,31 @@ private
   def chain_up_notice(block)
     title = "#{block.block} 价格上涨"
     desp = "价格: #{block.tickers.last.last_price} USDT, 时间: #{Time.now.strftime('%F %T')}"
-    User.wechat_notice(title,desp)
+    User.wechat_group_notice(title,desp)
   end
 
   def chain_down_notice(block)
     title = "#{block.block} 价格下跌"
     desp = "价格: #{block.tickers.last.last_price} USDT, 时间: #{Time.now.strftime('%F %T')}"
-    User.wechat_notice(title,desp)
+    User.wechat_group_notice(title,desp)
+  end
+
+  def full_chain_notice(block)
+    title = "#{block.block} 加仓通知"
+    content = "#{block.block}位于 MA 上涨点，价格:#{block.tickers.last.last_price} USDT,
+    买入价格：#{block.buy_business.first.buy.price},
+    持有数量：#{block.buy_business.map {|x| x.amount }.sum},
+    本金数额：#{block.buy_business.map {|x| x.total }.sum}"
+    User.wechat_notice(title,content)
+  end
+
+  def empty_chain_notice(block)
+    title = "#{block.block} 空仓通知"
+    content = "#{block.block}位于 MA 下跌点，价格:#{block.tickers.last.last_price} USDT,
+    买入价格：#{block.buy_business.first.buy.price},
+    持有数量：#{block.buy_business.map {|x| x.amount }.sum},
+    本金数额：#{block.buy_business.map {|x| x.total }.sum}"
+    User.wechat_notice(title,content)
   end
 
 end

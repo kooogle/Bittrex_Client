@@ -11,6 +11,7 @@ class Chain < ActiveRecord::Base
   self.per_page = 10
   has_many :tickers, dependent: :destroy
   has_many :business, class_name:'Order'
+  has_many :buy_business,->{where(deal:1,state:true,repurchase:false)}, class_name:'Order' #所有买单记录
   has_many :low_buy_business,->{where(deal:1,state:true,frequency:false,repurchase:false)}, class_name:'Order' #低频买单记录
   has_many :high_buy_business,->{where(deal:1,state:true,frequency:true,repurchase:false)}, class_name:'Order' #高频买单价格未回购记录
   has_one :point, class_name:'Point'
