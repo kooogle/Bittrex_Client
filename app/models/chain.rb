@@ -24,7 +24,7 @@ class Chain < ActiveRecord::Base
   def buy_cost
     cost = self.buy_business.map {|x| x.total }.sum
     return cost.round(2) if cost > 0
-    '--'
+    '一'
   end
 
   def buy_price
@@ -33,7 +33,7 @@ class Chain < ActiveRecord::Base
       price = buy_business.map {|x| x.total }.sum / buy_business.map {|x| x.amount }.sum
       return price.round(2)
     end
-    '--'
+    '一'
   end
 
   def to_cny

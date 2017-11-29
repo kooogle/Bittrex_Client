@@ -11,21 +11,11 @@ class Api::QuotesController < ApplicationController
     render json:{code:200}
   end
 
-  #每5分钟获取一次最新价格，根据价格涨幅做买卖通知 低频交易
+  #每3分钟获取一次最新价格，与当前持有的货币成本价比较
   def hit_markets
     Chain.all.each do |item|
-      if item.point && item.point.state
-        quote_macd_analysis(item)
-      end
-    end
-    render json:{code:200}
-  end
-
-  #每2分钟获取一次最新价格，高频交易
-  def hit_high_markets
-    Chain.all.each do |item|
-      if item.point && item.point.frequency
-        high_analysis(item)
+      if item.buy_price.to_i > 0
+        quote_analysis(item)
       end
     end
     render json:{code:200}
@@ -43,31 +33,15 @@ private
     return ((new_price - old_price) / old_price * 100).to_i
   end
 
-  def quote_report(market)
-    market = block.market
-    if block.high_nearby(market['Bid']) || market['Bid'] > block.high
-      string = "#{self.currency}-#{self.block} 接近最高价，买一价：#{market['Bid']}"
-    elsif block.low_nearby(market['Ask']) || market['Ask'] < block.low
-      string = "#{self.currency}-#{self.block} 接近最低价，买一价：#{market['Ask']}"
-    end
-    User.sms_yunpian(string)
-  end
-
-  def quote_macd_analysis(block)
+  def quote_analysis(block)
     market = block.market
     high_price = market.first['High']
-    low_price = market.first['Low']
     bid_price = market.first['Bid']
-    ask_price = market.first['Ask']
-    recent = block.tickers.last(7)
-    stock = block.tickers.last(2).map {|x| x.last_price }
-    diff_dea_last = recent.map {|x| x.macd_diff - x.macd_dea }
-    if stock[-1] > stock[-2]
-      if bid_price * 1.01 > high_price && diff_dea_last[-1] > 0
-        sell_macd_market(block,market)
-      elsif ask_price < low_price * 1.01 && diff_dea_last[-1] < 0
-        buy_macd_market(block,market)
-      end
+    buy_price = block.buy_price
+    if bid_price < buy_price
+      fall_price_notice(block,bid_price,buy_price)
+    elsif bid_price > high_price * 0.99
+      high_price_notice(block,bid_price,buy_price)
     end
   end
 
@@ -109,11 +83,15 @@ private
 
   def middle_ma_business(block)
     market = block.market
-    recent = block.tickers.last(2)
+    recent = block.tickers.last(10)
     ma_diff = recent.map {|x| x.ma5_price - x.ma10_price }
-    if ma_diff[-1] > 0 && ma_diff[-2]
+    macd_diff = recent.map {|x| x.macd_diff }
+    tick_diff = recent.map {|x| x.last_price }
+    if ma_diff[-2] == ma_diff.min && ma_diff[-4..-1].max < 0 && macd_diff[-1] > 0
       buy_ma_market(block,market)
-    elsif  ma_diff[-1] < 0 && ma_diff[-2]
+    elsif tick_diff[-2] == tick_diff.max && macd_diff[-1] > 0
+      sell_ma_market(block,market)
+    elsif macd_diff[-2] == macd_diff.max
       sell_ma_market(block,market)
     end
   end
@@ -138,7 +116,7 @@ private
     last_price = market.first['Bid']
     buy = block.high_buy_business.first
     balance = block.balance
-    if buy && balance > 0 && last_price > buy.price * 1.01
+    if buy && balance > 0 && last_price > buy.price * 1.03
       amount = balance > buy.amount ? buy.amount : balance
       high_sell_chain(block,amount,last_price)
     elsif buy && last_price < buy.price
@@ -204,13 +182,13 @@ private
 
   def chain_up_notice(block)
     title = "#{block.block} 价格上涨"
-    desp = "价格: #{block.tickers.last.last_price} USDT, 时间: #{Time.now.strftime('%F %T')}"
+    desp = "价格: #{block.tickers.last.last_price} USDT, 时间: #{Time.now.strftime('%F %H:%M')}"
     User.wechat_group_notice(title,desp)
   end
 
   def chain_down_notice(block)
     title = "#{block.block} 价格下跌"
-    desp = "价格: #{block.tickers.last.last_price} USDT, 时间: #{Time.now.strftime('%F %T')}"
+    desp = "价格: #{block.tickers.last.last_price} USDT, 时间: #{Time.now.strftime('%F %H:%M')}"
     User.wechat_group_notice(title,desp)
   end
 
@@ -232,4 +210,15 @@ private
     User.wechat_notice(title,content)
   end
 
+  def fall_price_notice(block,bid_price,buy_price)
+    title = "#{block.block} 低于成本价"
+    content = "当前卖价：#{bid_price},购买成本：#{buy_price},时间：#{Time.now.strftime('%H:%M:%S')}"
+    User.wechat_notice(title,content)
+  end
+
+  def high_price_notice(block,bid_price,buy_price)
+    title = "#{block.block} 最大收益价"
+    content = "当前卖价：#{bid_price},购买成本：#{buy_price},时间：#{Time.now.strftime('%H:%M:%S')}"
+    User.wechat_notice(title,content)
+  end
 end
