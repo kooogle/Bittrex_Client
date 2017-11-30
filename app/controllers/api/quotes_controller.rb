@@ -4,9 +4,6 @@ class Api::QuotesController < ApplicationController
     Chain.all.each do |item|
       item.generate_ticker rescue nil
       extremum_report(item)
-      if item.point && item.point.state
-        middle_ma_business(item)
-      end
     end
     render json:{code:200}
   end
@@ -14,9 +11,9 @@ class Api::QuotesController < ApplicationController
   #每3分钟获取一次最新价格，与当前持有的货币成本价比较
   def hit_markets
     Chain.all.each do |item|
-      if item.buy_price.to_i > 0
-        quote_analysis(item)
-      end
+      market = item.market
+      quote_analysis(item,market) if item.buy_price.to_i > 0
+      quote_business(item,market) if item.point && item.point.state
     end
     render json:{code:200}
   end
@@ -33,71 +30,32 @@ private
     return ((new_price - old_price) / old_price * 100).to_i
   end
 
-  def quote_analysis(block)
-    market = block.market
+  def quote_analysis(block,market)
     high_price = market.first['High']
+    low_price = market.first['Low']
     bid_price = market.first['Bid']
+    ask_price = market.first['Ask']
     buy_price = block.buy_price
-    if bid_price < buy_price
+    if bid_price < buy_price * 0.95
       fall_price_notice(block,bid_price,buy_price)
-    elsif bid_price > high_price * 0.99
+    elsif bid_price > buy_price * 1.05
       high_price_notice(block,bid_price,buy_price)
     end
   end
 
-  #根据 MACD
-  def middle_macd_business(block)
-    market = block.market
-    recent = block.tickers.last(5)
-    diff_dea_last = recent.map {|x| x.macd_diff - x.macd_dea }
-    if diff_dea_last[-1] < 0 && diff_dea_last[-2] > 0 && diff_dea_last[0..-2].min > 0
-      sell_macd_market(block,market)
-    elsif diff_dea_last[-1] > 0 && diff_dea_last[-2] < 0 && diff_dea_last[0..-2].max < 0
-      buy_macd_market(block,market)
+  def quote_business(block,market)
+    high_price = market.first['High']
+    low_price = market.first['Low']
+    bid_price = market.first['Bid']
+    ask_price = market.first['Ask']
+    if ask_price < low_price * 1.007
+      buy_market(block,ask_price)
+    elsif bid_price < high_price * 0.993
+      sell_market(block,bid_price)
     end
   end
 
-  def sell_macd_market(block,market)
-    last_price = market.first['Bid']
-    buy = block.low_buy_business.first
-    balance = block.balance
-    if buy && balance > 0 && last_price > buy.price * 1.01
-      amount = balance > buy.amount ? buy.amount : balance
-      sell_chain(block,amount,last_price)
-    end
-  end
-
-  def buy_macd_market(block,market)
-    last_price = market.first['Ask']
-    point = block.point
-    avl_money = block.money
-    buy_money = point.low_price
-    total_money = point.total_value
-    had_total = block.low_buy_business.map {|x| x.total}.sum
-    if avl_money > 1 && had_total < total_money
-      money = avl_money > buy_money ? buy_money : avl_money
-      amount = (money/last_price).to_d.round(5,:truncate).to_f
-      buy_chain(block,amount,last_price) if amount > 0
-    end
-  end
-
-  def middle_ma_business(block)
-    market = block.market
-    recent = block.tickers.last(10)
-    ma_diff = recent.map {|x| x.ma5_price - x.ma10_price }
-    macd_diff = recent.map {|x| x.macd_diff }
-    tick_diff = recent.map {|x| x.last_price }
-    if ma_diff[-2] == ma_diff.min && ma_diff[-4..-1].max < 0 && macd_diff[-1] > 0
-      buy_ma_market(block,market)
-    elsif tick_diff[-2] == tick_diff.max && macd_diff[-1] > 0
-      sell_ma_market(block,market)
-    elsif macd_diff[-2] == macd_diff.max
-      sell_ma_market(block,market)
-    end
-  end
-
-  def buy_ma_market(block,market)
-    last_price = market.first['Ask']
+  def buy_market(block,last_price)
     point = block.point
     avl_money = block.money
     buy_money = point.high_price
@@ -112,11 +70,10 @@ private
     end
   end
 
-  def sell_ma_market(block,market)
-    last_price = market.first['Bid']
+  def sell_market(block,last_price)
     buy = block.high_buy_business.first
     balance = block.balance
-    if buy && balance > 0 && last_price > buy.price * 1.03
+    if buy && balance > 0 && last_price > buy.price * 1.07
       amount = balance > buy.amount ? buy.amount : balance
       high_sell_chain(block,amount,last_price)
     elsif buy && last_price < buy.price
