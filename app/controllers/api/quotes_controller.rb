@@ -106,8 +106,10 @@ private
     macd_quotes = quotes.map {|x| x.macd_diff - x.macd_dea}
     if td_quotes.max == td_quotes[-1]
       chain_up_notice(block)
+      up_sms_notice(block) if work_time
     elsif td_quotes.min == td_quotes[-1]
       chain_down_notice(block)
+      down_sms_notice(block) if work_time
     end
   end
 
@@ -135,6 +137,16 @@ private
     current = Time.now.strftime('%H').to_i
     return true if  current > 9 && current < 22
     nil
+  end
+
+  def up_sms_notice(block)
+    content = "#{block.block} 最高价值，价格: #{block.tickers.last.last_price} USDT, 时间: #{Time.now.strftime('%F %H:%M')}"
+    User.sms_notice(content)
+  end
+
+  def down_sms_notice()
+    content = "#{block.block} 最低价值，价格: #{block.tickers.last.last_price} USDT, 时间: #{Time.now.strftime('%F %H:%M')}"
+    User.sms_notice(content)
   end
 
   def chain_up_notice(block)
