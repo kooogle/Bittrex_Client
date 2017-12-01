@@ -12,7 +12,7 @@ class Api::QuotesController < ApplicationController
   def hit_markets
     Chain.all.each do |item|
       market = item.market
-      quote_analysis(item,market) if item.buy_price.to_i > 0
+      quote_analysis(item,market) if item.buy_price.to_i > 0 && work_time
       quote_business(item,market) if item.point && item.point.state
     end
     render json:{code:200}
