@@ -71,11 +71,15 @@ private
   end
 
   def sell_market(block,last_price)
-    buy = block.high_buy_business.first
+    buy = block.buy_business.first
     balance = block.balance
     if buy && balance > 0 && last_price > buy.price * 1.07
       amount = balance > buy.amount ? buy.amount : balance
-      high_sell_chain(block,amount,last_price)
+      if buy.frequency
+        high_sell_chain(block,amount,last_price)
+      else
+        sell_chain(block,amount,last_price)
+      end
     elsif buy && last_price < buy.price
       empty_chain_notice(block)
     end
