@@ -21,8 +21,8 @@ class Api::StocksController < ApplicationController
     chain = Chain.first
     tickers = chain.tickers.last(48)
     render json:{
-      block_ids: chains.map{|x| x.id},
-      blocks: chains.map{|x| x.label},
+      block_ids: chains.map{|x| x.id },
+      blocks: chains.map{|x| x.block },
       markets: chains.map{|x| x.full_name},
       avg_price:avg_price(tickers.map{|x| x.last_price}),
       time: tickers.map{|x| x.created_at.strftime('%H:%M')},

@@ -48,9 +48,9 @@ private
     low_price = market.first['Low']
     bid_price = market.first['Bid']
     ask_price = market.first['Ask']
-    if ask_price < low_price * 1.007
+    if ask_price < low_price * 1.01
       buy_market(block,ask_price)
-    elsif bid_price < high_price * 0.993
+    elsif bid_price > high_price * 0.99
       sell_market(block,bid_price)
     end
   end
@@ -73,7 +73,7 @@ private
   def sell_market(block,last_price)
     buy = block.buy_business.first
     balance = block.balance
-    if buy && balance > 0 && last_price > buy.price * 1.07
+    if buy && balance > 0 && last_price > buy.price * 1.0731
       amount = balance > buy.amount ? buy.amount : balance
       if buy.frequency
         high_sell_chain(block,amount,last_price)
@@ -105,6 +105,7 @@ private
 
   def extremum_report(block)
     quotes = block.tickers.last(48)
+    two_quotes = block.tickers.last(96).map {|x| x.last_price}
     ma_diff = quotes[-2..-1].map {|x| x.ma5_price - x.ma10_price}
     td_quotes = quotes.map {|x| x.last_price}
     macd_quotes = quotes.map {|x| x.macd_diff - x.macd_dea}
