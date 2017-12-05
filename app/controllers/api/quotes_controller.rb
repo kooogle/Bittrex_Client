@@ -103,18 +103,28 @@ private
     order.save
   end
 
+  def buy_down_chain(block,last_price)
+    point = block.point
+    avl_money = block.money
+    buy_money = point.low_price
+    had_buy = block.low_buy_business.count
+    if had_buy == 0 && avl_money > 1
+      money = avl_money > buy_money ? buy_money : avl_money
+      amount = (money / last_price).to_d.round(4,:truncate).to_f
+      buy_chain(block,amount,last_price) if amount > 0
+    end
+  end
+
   def extremum_report(block)
     quotes = block.tickers.last(48)
-    two_quotes = block.tickers.last(96).map {|x| x.last_price}
-    ma_diff = quotes[-2..-1].map {|x| x.ma5_price - x.ma10_price}
     td_quotes = quotes.map {|x| x.last_price}
-    macd_quotes = quotes.map {|x| x.macd_diff - x.macd_dea}
     if td_quotes.max == td_quotes[-1]
       chain_up_notice(block)
       up_sms_notice(block) if work_time
     elsif td_quotes.min == td_quotes[-1]
-      chain_down_notice(block)
+      chain_down_notice(block,quotes[-1])
       down_sms_notice(block) if work_time
+      buy_down_chain(block,td_quotes[-1]) if block.point && block.point.state
     end
   end
 
