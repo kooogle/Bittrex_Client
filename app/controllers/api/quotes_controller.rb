@@ -58,7 +58,7 @@ private
     if bid_price > high_price * 0.99
       sell_market(block,bid_price)
     end
-    if bid_price > buy_price * 1.1
+    if bid_price > buy_price * 1.1 && !work_time
       sell_market(block,bid_price)
     end
   end
