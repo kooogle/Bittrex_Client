@@ -48,12 +48,17 @@ private
     bid_price = market.first['Bid']
     ask_price = market.first['Ask']
     buy_price = block.buy_price
-    if bid_price < buy_price * 0.95
-      fall_price_notice(block,bid_price,buy_price) if work_time
-    elsif bid_price > buy_price * 1.05
-      high_price_notice(block,bid_price,buy_price) if work_time
+    if work_time
+      if bid_price < buy_price * 0.95
+        fall_price_notice(block,bid_price,buy_price)
+      elsif bid_price > buy_price * 1.05
+        high_price_notice(block,bid_price,buy_price)
+      end
     end
     if bid_price > high_price * 0.99
+      sell_market(block,bid_price)
+    end
+    if bid_price > buy_price * 1.1
       sell_market(block,bid_price)
     end
   end
