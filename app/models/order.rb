@@ -56,7 +56,7 @@ class Order < ActiveRecord::Base
 
   def calculate_total
     if self.total.nil?
-      total = self.amount * self.price * 0.9975
+      total = self.amount * self.price
       self.update_attributes(total: total.round(2))
     end
   end

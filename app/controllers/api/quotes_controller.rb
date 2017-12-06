@@ -12,8 +12,7 @@ class Api::QuotesController < ApplicationController
   def hit_markets
     Chain.all.each do |item|
       market = item.market
-      quote_analysis(item,market) if item.buy_price.to_i > 0 && work_time
-      quote_business(item,market) if item.point && item.point.state
+      quote_analysis(item,market) if item.buy_price.to_i > 0
     end
     render json:{code:200}
   end
@@ -26,6 +25,19 @@ class Api::QuotesController < ApplicationController
 
 private
 
+  def extremum_report(block)
+    quotes = block.tickers.last(48)
+    td_quotes = quotes.map {|x| x.last_price}
+    if td_quotes.max == td_quotes[-1]
+      chain_up_notice(block)
+      up_sms_notice(block) if work_time
+    elsif td_quotes.min == td_quotes[-1]
+      chain_down_notice(block)
+      down_sms_notice(block) if work_time
+      buy_down_chain(block,td_quotes[-1]) if block.point && block.point.state && !work_time
+    end
+  end
+
   def amplitude(old_price,new_price)
     return ((new_price - old_price) / old_price * 100).to_i
   end
@@ -37,36 +49,12 @@ private
     ask_price = market.first['Ask']
     buy_price = block.buy_price
     if bid_price < buy_price * 0.95
-      fall_price_notice(block,bid_price,buy_price)
+      fall_price_notice(block,bid_price,buy_price) if work_time
     elsif bid_price > buy_price * 1.05
-      high_price_notice(block,bid_price,buy_price)
+      high_price_notice(block,bid_price,buy_price) if work_time
     end
-  end
-
-  def quote_business(block,market)
-    high_price = market.first['High']
-    low_price = market.first['Low']
-    bid_price = market.first['Bid']
-    ask_price = market.first['Ask']
-    if ask_price < low_price * 1.01
-      buy_market(block,ask_price)
-    elsif bid_price > high_price * 0.99
+    if bid_price > high_price * 0.99
       sell_market(block,bid_price)
-    end
-  end
-
-  def buy_market(block,last_price)
-    point = block.point
-    avl_money = block.money
-    buy_money = point.high_price
-    total_money = point.high_value
-    had_total = block.high_buy_business.map {|x| x.total}.sum
-    if avl_money > 1 && had_total < total_money
-      money = avl_money > buy_money ? buy_money : avl_money
-      amount = (money/last_price).to_d.round(4,:truncate).to_f
-      high_buy_chain(block,amount,last_price) if amount > 0
-    elsif avl_money > 1 && had_total > total_money
-      full_chain_notice(block)
     end
   end
 
@@ -75,13 +63,7 @@ private
     balance = block.balance
     if buy && balance > 0 && last_price > buy.price * 1.0731
       amount = balance > buy.amount ? buy.amount : balance
-      if buy.frequency
-        high_sell_chain(block,amount,last_price)
-      else
-        sell_chain(block,amount,last_price)
-      end
-    elsif buy && last_price < buy.price
-      empty_chain_notice(block)
+      sell_chain(block,amount,last_price)
     end
   end
 
@@ -109,22 +91,9 @@ private
     buy_money = point.low_price
     had_buy = block.low_buy_business.count
     if had_buy == 0 && avl_money > 1
-      money = avl_money > buy_money ? buy_money : avl_money
+      money = avl_money * 0.9975 > buy_money ? buy_money : avl_money * 0.9975
       amount = (money / last_price).to_d.round(4,:truncate).to_f
       buy_chain(block,amount,last_price) if amount > 0
-    end
-  end
-
-  def extremum_report(block)
-    quotes = block.tickers.last(48)
-    td_quotes = quotes.map {|x| x.last_price}
-    if td_quotes.max == td_quotes[-1]
-      chain_up_notice(block)
-      up_sms_notice(block) if work_time
-    elsif td_quotes.min == td_quotes[-1]
-      chain_down_notice(block)
-      down_sms_notice(block) if work_time
-      buy_down_chain(block,td_quotes[-1]) if block.point && block.point.state && !work_time
     end
   end
 
