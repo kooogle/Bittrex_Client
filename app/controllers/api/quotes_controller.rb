@@ -159,7 +159,7 @@ private
     User.sms_notice(content)
   end
 
-  def down_sms_notice()
+  def down_sms_notice(block)
     content = "#{block.block} 最低价值，价格: #{block.tickers.last.last_price} USDT, 时间: #{Time.now.strftime('%F %H:%M')}"
     User.sms_notice(content)
   end
