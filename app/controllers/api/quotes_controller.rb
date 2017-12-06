@@ -122,7 +122,7 @@ private
       chain_up_notice(block)
       up_sms_notice(block) if work_time
     elsif td_quotes.min == td_quotes[-1]
-      chain_down_notice(block,quotes[-1])
+      chain_down_notice(block)
       down_sms_notice(block) if work_time
       buy_down_chain(block,td_quotes[-1]) if block.point && block.point.state
     end
