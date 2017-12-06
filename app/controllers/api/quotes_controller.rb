@@ -124,7 +124,7 @@ private
     elsif td_quotes.min == td_quotes[-1]
       chain_down_notice(block)
       down_sms_notice(block) if work_time
-      buy_down_chain(block,td_quotes[-1]) if block.point && block.point.state
+      buy_down_chain(block,td_quotes[-1]) if block.point && block.point.state && !work_time
     end
   end
 
