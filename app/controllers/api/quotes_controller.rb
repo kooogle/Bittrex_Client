@@ -8,7 +8,7 @@ class Api::QuotesController < ApplicationController
     render json:{code:200}
   end
 
-  #每3分钟获取一次最新价格，与当前持有的货币成本价比较
+  #每5分钟获取一次最新价格，与当前持有的货币成本价比较
   def hit_markets
     Chain.all.each do |item|
       market = item.market
@@ -58,17 +58,18 @@ private
     if bid_price > high_price * 0.99
       sell_market(block,bid_price)
     end
-    if bid_price > buy_price * 1.1 && !work_time
-      sell_market(block,bid_price)
-    end
   end
 
   def sell_market(block,last_price)
     buy = block.buy_business.first
     balance = block.balance
-    if buy && balance > 0 && last_price > buy.price * 1.0731
+    if buy && balance > 0 && last_price > buy.price * 1.1
       amount = balance > buy.amount ? buy.amount : balance
-      sell_chain(block,amount,last_price)
+      if buy.frequency
+        high_sell_chain(block,amount,last_price)
+      else
+        sell_chain(block,amount,last_price)
+      end
     end
   end
 
