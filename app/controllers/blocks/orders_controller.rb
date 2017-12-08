@@ -54,6 +54,6 @@ class Blocks::OrdersController < Blocks::BaseController
     end
 
     def order_params
-      params.require(:order).permit(:chain_id,:deal,:amount,:price,:total,:state)
+      params.require(:order).permit(:chain_id,:deal,:amount,:price,:total,:state,:frequency,:repurchase)
     end
 end

@@ -39,7 +39,7 @@ private
   end
 
   def amplitude(old_price,new_price)
-    return ((new_price - old_price) / old_price * 100).to_i
+    return ((new_price - old_price) / old_price.to_f * 100).to_i
   end
 
   def quote_analysis(block,market)
@@ -61,15 +61,11 @@ private
   end
 
   def sell_market(block,last_price)
-    buy = block.buy_business.first
+    buy = block.low_buy_business.first
     balance = block.balance
     if buy && balance > 0 && last_price > buy.price * 1.1
       amount = balance > buy.amount ? buy.amount : balance
-      if buy.frequency
-        high_sell_chain(block,amount,last_price)
-      else
-        sell_chain(block,amount,last_price)
-      end
+      sell_chain(block,amount,last_price)
     end
   end
 
