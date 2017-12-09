@@ -3,7 +3,10 @@ class Api::QuotesController < ApplicationController
   def hit_tickers
     Chain.all.each do |item|
       item.generate_ticker rescue nil
+    end
+    Chain.all.each do |item|
       extremum_report(item)
+      macd_ma_business(item) if item.point && item.point.state
     end
     render json:{code:200}
   end
@@ -34,8 +37,19 @@ private
     elsif td_quotes.min == td_quotes[-1]
       chain_down_notice(block)
       down_sms_notice(block) if work_time
-      buy_down_chain(block,td_quotes[-1]) if block.point && block.point.state && !work_time
     end
+  end
+
+  def macd_ma_business(block)
+      quotes = block.tickers.last(2)
+      market = item.market
+      bid_price = market.first['Bid']
+      macd_diff = quotes.map {|x| x.macd_diff }
+      if macd_diff[-1] > 0 && macd_diff[-2] < 0
+        buy_down_chain(block,bid_price)
+      elsif macd_diff[-1] < 0 && macd_diff[-2] > 0
+        sell_down_chain(block,bid_price)
+      end
   end
 
   def amplitude(old_price,new_price)
@@ -96,6 +110,15 @@ private
       money = avl_money * 0.9975 > buy_money ? buy_money : avl_money * 0.9975
       amount = (money / last_price).to_d.round(4,:truncate).to_f
       buy_chain(block,amount,last_price) if amount > 0
+    end
+  end
+
+  def sell_down_chain(block,last_price)
+    buy = block.low_buy_business.first
+    balance = block.balance
+    if buy && balance > 0 && last_price > buy.price * 1.01
+      amount = balance > buy.amount ? buy.amount : balance
+      sell_chain(block,amount,last_price)
     end
   end
 
