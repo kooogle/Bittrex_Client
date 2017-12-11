@@ -16,6 +16,7 @@ class Api::QuotesController < ApplicationController
     Chain.all.each do |item|
       market = item.market
       quote_analysis(item,market) if item.buy_price.to_i > 0
+      high_business(item,market) if item.point && item.point.state
     end
     render json:{code:200}
   end
@@ -50,6 +51,43 @@ private
       elsif macd_diff[-1] < 0 && macd_diff[-2] > 0
         sell_down_chain(block,bid_price)
       end
+  end
+
+  def high_business(block,market)
+    quotes = block.tickers.last(3)
+    bid_price = market.first['Bid']
+    macd_diff = quotes.map {|x| x.macd_diff }
+    ma_diff = quotes.map {|x| x.ma5_price - x.ma10_price }
+    stock = quotes.map {|x| x.last_price }
+    if macd_diff[-1] > 0 && stock[-1] != block.high
+      if bid_price < stock[-1] && (ma_diff[-1] > 0 || stock[-1] > stock[-2] || ma_diff[-1] > 0)
+        high_buy_market(block,bid_price * 0.9975)
+      end
+    end
+    high_sell_market(block,bid_price)
+  end
+
+  def high_buy_market(block,last_price)
+    buy = block.high_buy_business
+    point = block.point
+    balance = block.money
+    avl_money = point.high_price
+    tol_money = point.high_value
+    had_money = buy.map {|x| x.total }.sum
+    if had_money < tol_money && balance > 1
+      money = balance * 0.9975 > avl_money ? avl_money : balance * 0.9975
+      amount = (money / last_price).to_d.round(4,:truncate).to_f
+      high_buy_chain(block,amount,last_price)
+    end
+  end
+
+  def high_sell_market(block,last_price)
+    buy = block.high_buy_business.first
+    balance = block.balance
+    if buy && balance > 0 && last_price > buy.price * 1.02
+      amount = balance > buy.amount ? buy.amount : balance
+      high_sell_chain(block,amount,last_price)
+    end
   end
 
   def amplitude(old_price,new_price)
