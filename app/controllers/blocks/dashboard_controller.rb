@@ -1,7 +1,7 @@
 class Blocks::DashboardController < Blocks::BaseController
 
   def index
-    block = params[:block] || Chain.named.first.id
+    block = params[:block] || Chain.first.id
     sta_time = params[:start] || Date.current.to_s
     end_time = params[:end] || Date.current.to_s
     @block = Chain.find(block)

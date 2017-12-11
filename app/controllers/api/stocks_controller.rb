@@ -1,7 +1,7 @@
 class Api::StocksController < ApplicationController
 
   def quote
-    block = params[:block] || Chain.named.first.id
+    block = params[:block] || Chain.first.id
     amount = params[:amount] || 48
     chain = Chain.find(block)
     tickers = chain.tickers.last(amount.to_i)

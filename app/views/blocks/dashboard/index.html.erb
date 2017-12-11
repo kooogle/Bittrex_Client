@@ -18,7 +18,7 @@
         <div class="col-sm-2">
           <select onchange="javascript:location.href = this.value;" class="form-control" style="display: inline;">
             <option value="?">请选择区块链</option>
-            <% Chain.named.each do |item|%>
+            <% Chain.all.each do |item|%>
               <option value="?block=<%= item.id %>&start=<%= params[:start] || Date.current.to_s %>&end=<%= params[:end] || Date.current.to_s %>" <%= 'selected' if params[:block].to_i == item.id || (!params[:block].present? && item.id == Chain.named.first.id)%>><%= item.full_name %></option>
             <% end %>
           </select>

@@ -2,7 +2,7 @@ class Blocks::ChainsController < Blocks::BaseController
   before_action :set_chain, only:[:edit, :update, :destroy]
 
   def index
-    @chains = Chain.named.paginate(page:params[:page])
+    @chains = Chain.paginate(page:params[:page])
   end
 
   def new
