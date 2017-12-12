@@ -23,7 +23,6 @@
               <th tabindex="0" aria-controls="example1" style="text-align: center">货币</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">总数</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">可用</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">挂单</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">价值</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center;width: 240px">操作</th>
             </tr>
@@ -34,10 +33,9 @@
                 <td><%= item.block %></td>
                 <td><%= item.balance %></td>
                 <td><%= item.available %></td>
-                <td><%= item.pending %></td>
                 <td>$
-                  <%#= (item.balance.to_f * item.chain.to_usdt).round(2) if item.chain %>
-                  <%#= item.balance.to_f.round(2) if item.block =='USDT' %>
+                  <%= (item.balance.to_f * item.chain.to_usdt).round(2) if item.chain %>
+                  <%= item.balance.to_f.round(2) if item.block =='USDT' %>
                 </td>
                 <td>
                   <a href="<%= all_out_blocks_balance_path(item) %>" class="btn bg-black btn-flat" data-confirm="确定要清仓<%= item.block %>？">
