@@ -13,4 +13,5 @@
 
 class Point < ActiveRecord::Base
   belongs_to :chain, class_name:'Chain', foreign_key:'chain_id'
+  scope :blocked, ->{ order(chain_id: :asc) }
 end
