@@ -89,6 +89,9 @@ Rails.application.routes.draw do
       collection do
         get 'sync'
       end
+      member do
+        get 'all_out'
+      end
     end
   end
 
