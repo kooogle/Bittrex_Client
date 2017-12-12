@@ -52,6 +52,12 @@ class Chain < ActiveRecord::Base
     cny_finance
   end
 
+  def to_usdt
+    return (self.market.first["Bid"]).round(2) if self.currency == 'USDT'
+    return (Chain.where(block:'ETH',currency:'USDT').first.market.first["Bid"]).round(2) if self.currency == 'ETH'
+    return (Chain.where(block:'BTC',currency:'USDT').first.market.first["Bid"]).round(2) if self.currency == 'BTC'
+  end
+
   def markets
     "#{self.currency}-#{self.block}"
   end

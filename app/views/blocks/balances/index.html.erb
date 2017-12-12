@@ -35,8 +35,8 @@
                 <td><%= item.balance %></td>
                 <td><%= item.available %></td>
                 <td><%= item.pending %></td>
-                <td>
-                  <%= (item.balance.to_f * item.chain.to_cny).round(2) if item.chain %>
+                <td>$
+                  <%= (item.balance.to_f * item.chain.to_usdt).round(2) if item.chain %>
                   <%= (item.balance.to_f * 6.6375).round(2) if item.block =='USDT' %>
                 </td>
                 <td>
