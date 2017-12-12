@@ -49,6 +49,7 @@ class Blocks::BalancesController < Blocks::BaseController
       price = block.market.first["Bid"]
       if amount > 0 && price > 0
         sell_chain(block,amount,price)
+        block.business.where(deal:1).destroy_all
       end
       redirect_to blocks_balances_path, notice: '库存币种全部清仓'
     else
