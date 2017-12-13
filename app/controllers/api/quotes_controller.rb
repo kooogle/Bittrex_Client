@@ -59,8 +59,8 @@ private
     macd_diff = quotes.map {|x| x.macd_diff }
     ma_diff = quotes.map {|x| x.ma5_price - x.ma10_price }
     stock = quotes.map {|x| x.last_price }
-    if macd_diff[-1] > 0 && stock[-1] != block.high
-      if bid_price < stock[-1] && (ma_diff[-1] > 0 || stock[-1] > stock[-2] || ma_diff[-1] > 0)
+    if macd_diff[-1] > 0 && stock[-1] < block.high
+      if bid_price < stock[-1] && (ma_diff[-1] > 0 || stock[-1] > stock[-2])
         high_buy_market(block,bid_price * 0.9975)
       end
     end
