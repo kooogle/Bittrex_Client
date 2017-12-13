@@ -144,7 +144,7 @@ private
     avl_money = block.money
     buy_money = point.low_price
     had_buy = block.low_buy_business.count
-    if had_buy == 0 && avl_money > 1
+    if had_buy == 0 && avl_money > 1 && buy_money > 1
       money = avl_money * 0.9975 > buy_money ? buy_money : avl_money * 0.9975
       amount = (money / last_price).to_d.round(4,:truncate).to_f
       buy_chain(block,amount,last_price) if amount > 0
