@@ -1,4 +1,4 @@
-<%= content_for(:title,  '活动挂单列表 | BLOCK') %>
+<%= content_for(:title,  '挂单记录 | BLOCK') %>
 <section class="content-header">
   <h1>
     活动挂单 <small>信息预览</small>
@@ -22,7 +22,8 @@
               <th tabindex="0" aria-controls="example1" style="text-align: center">数量</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">单价</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">价值</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center;width: 240px">操作</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">时间</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">操作</th>
             </tr>
             </thead>
             <tbody>
@@ -33,7 +34,8 @@
                 <td><%= item['QuantityRemaining'] %></td>
                 <td><%= item['Quantity'] %></td>
                 <td><%= item['Limit'] %></td>
-                <td><%= (item['Limit'] * item['Quantity'] * 0.9975).round(2) %></td>
+                <td><%= (item['Limit'] * item['Quantity']).round(2) %></td>
+                <td><%= item['Opened'].to_time.strftime('%F %T') %></td>
                 <td>
                   <a href="<%= cancel_blocks_orders_path(uuid:item['OrderUuid']) %>" class="btn bg-aqua btn-flat">
                     <i class="fa fa-shower"></i>
