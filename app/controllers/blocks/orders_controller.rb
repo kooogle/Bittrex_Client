@@ -44,6 +44,7 @@ class Blocks::OrdersController < Blocks::BaseController
 
   def cancel
     Order.cancel(params[:uuid])
+    Order.find_by_result(params[:uuid]).destroy rescue nil
     flash[:notice] = "买卖挂单取消交易"
     redirect_to :back
   end
