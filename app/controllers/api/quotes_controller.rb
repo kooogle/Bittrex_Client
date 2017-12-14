@@ -74,9 +74,8 @@ private
     avl_money = point.high_price
     tol_money = point.high_value
     had_money = buy.map {|x| x.total }.sum
-    if had_money < tol_money && balance > 1
-      money = balance * 0.9975 > avl_money ? avl_money : balance * 0.9975
-      amount = (money / last_price).to_d.round(4,:truncate).to_f
+    if had_money < tol_money && balance * 0.9975 > avl_money
+      amount = (avl_money / last_price).to_d.round(4,:truncate).to_f
       high_buy_chain(block,amount,last_price)
     end
   end
