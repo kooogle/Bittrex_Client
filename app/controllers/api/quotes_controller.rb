@@ -81,7 +81,7 @@ private
   end
 
   def high_sell_market(block,last_price)
-    buy = block.high_buy_business.first
+    buy = block.high_buy_business.order(price: :asc).first
     balance = block.balance
     if buy && balance > 0 && last_price > buy.price * 1.024
       amount = balance > buy.amount ? buy.amount : balance
