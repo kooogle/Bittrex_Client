@@ -61,7 +61,7 @@ private
     stock = quotes.map {|x| x.last_price }
     if macd_diff[-1] > 0 && stock[-1] < block.high
       if bid_price < stock[-1] && (ma_diff[-1] > 0 || stock[-1] > stock[-2])
-        high_buy_market(block,bid_price * 0.9975)
+        high_buy_market(block,bid_price)
       end
     end
     high_sell_market(block,bid_price)
@@ -83,7 +83,7 @@ private
   def high_sell_market(block,last_price)
     buy = block.high_buy_business.first
     balance = block.balance
-    if buy && balance > 0 && last_price > buy.price * 1.02
+    if buy && balance > 0 && last_price > buy.price * 1.024
       amount = balance > buy.amount ? buy.amount : balance
       high_sell_chain(block,amount,last_price)
     end
