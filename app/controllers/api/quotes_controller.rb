@@ -62,8 +62,8 @@ private
     buy = block.high_buy_business.order(price: :asc).first
     high_sell_market(block,bid_price)
     if macd_diff[-1] > 0
-      if bid_price < stock[-1] * 1.005
-        if ma_diff[-2] == ma_diff.min
+      if bid_price < stock[-1] * 1.01
+        if ma_diff[-2] == ma_diff.min && ma_diff[-2] < 0
           high_buy_market(block,bid_price)
         elsif ma_diff[-1] > 0 && ma_diff[-2] < 0
           high_buy_market(block,bid_price)
@@ -75,8 +75,10 @@ private
       end
     end
     if macd_diff[-1] < 0
-      if bid_price < stock[-1] * 1.005 && ma_diff[-2] == ma_diff.min
-        high_buy_market(block,bid_price)
+      if ma_diff[-2] == ma_diff.min && ma_diff[-2] < 0
+          if bid_price < stock[-1] * 1.005 
+              high_buy_market(block,bid_price)
+          end
       end
       if buy && bid_price > buy.price * 1.01 && ma_diff[-2] == ma_diff.max
         high_sell_chain(block,buy.amount,bid_price)
