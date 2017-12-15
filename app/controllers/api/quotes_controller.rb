@@ -71,6 +71,7 @@ private
       end
       if buy && bid_price > buy.price * 1.01 && ma_diff[-2] == ma_diff.max
         high_sell_chain(block,buy.amount,bid_price)
+        batch_sell_profit(block,bid_price,1.02)
       end
     end
     if macd_diff[-1] < 0
@@ -79,6 +80,7 @@ private
       end
       if buy && bid_price > buy.price * 1.01 && ma_diff[-2] == ma_diff.max
         high_sell_chain(block,buy.amount,bid_price)
+        batch_sell_profit(block,last_price,1.015)
       end
     end
   end
@@ -102,6 +104,9 @@ private
     if buy && balance > 0 && last_price > buy.price * 1.02
       amount = balance > buy.amount ? buy.amount : balance
       high_sell_chain(block,amount,last_price)
+    end
+    if last_price > buy.price * 1.025
+        batch_sell_profit(block,last_price,1.025)
     end
   end
 
@@ -254,12 +259,23 @@ private
 
   def all_out(block,price)
     begin
-      amount = block.balance
-      sell_chain(block,amount,price)
-      block.business.where(deal:1).destroy_all
+        amount = block.balance
+        sell_chain(block,amount,price)
+        block.business.where(deal:1).destroy_all
     rescue
-      nil
+        nil
     end
+  end
+
+  def batch_sell_profit(block,price,rate)
+      orders = block.high_buy_business.order(price: :asc)
+      if orders.count > 0
+          orders.each do |item|
+              if price > item.price * rate
+                  high_sell_chain(block,item.amount,price)
+              end
+          end
+      end
   end
 
 end
