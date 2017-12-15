@@ -107,7 +107,7 @@ private
       amount = balance > buy.amount ? buy.amount : balance
       high_sell_chain(block,amount,last_price)
     end
-    if last_price > buy.price * 1.025
+    if buy && last_price > buy.price * 1.025
         batch_sell_profit(block,last_price,1.025)
     end
   end
