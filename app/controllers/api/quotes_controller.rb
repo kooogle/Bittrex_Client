@@ -42,15 +42,15 @@ private
   end
 
   def macd_ma_business(block)
-      quotes = block.tickers.last(2)
-      market = item.market
-      bid_price = market.first['Bid']
-      macd_diff = quotes.map {|x| x.macd_diff }
-      if macd_diff[-1] > 0 && macd_diff[-2] < 0
-        buy_down_chain(block,bid_price)
-      elsif macd_diff[-1] < 0 && macd_diff[-2] > 0
-        sell_down_chain(block,bid_price)
-      end
+    quotes = block.tickers.last(2)
+    market = item.market
+    bid_price = market.first['Bid']
+    macd_diff = quotes.map {|x| x.macd_diff }
+    if macd_diff[-1] > 0 && macd_diff[-2] < 0
+      buy_down_chain(block,bid_price)
+    elsif macd_diff[-1] < 0 && macd_diff[-2] > 0
+      sell_down_chain(block,bid_price)
+    end
   end
 
   def high_business(block,market)
@@ -59,12 +59,28 @@ private
     macd_diff = quotes.map {|x| x.macd_diff }
     ma_diff = quotes.map {|x| x.ma5_price - x.ma10_price }
     stock = quotes.map {|x| x.last_price }
-    if macd_diff[-1] > 0 && stock[-1] < block.high
-      if bid_price < stock[-1] && (ma_diff[-1] > 0 || stock[-1] > stock[-2])
-        high_buy_market(block,bid_price)
+    buy = block.high_buy_business.order(price: :asc).first
+    high_sell_market(block,bid_price)
+    if macd_diff[-1] > 0
+      if bid_price < stock[-1] * 1.005
+        if ma_diff[-2] == ma_diff.min
+          high_buy_market(block,bid_price)
+        elsif ma_diff[-1] > 0 && ma_diff[-2] < 0
+          high_buy_market(block,bid_price)
+        end
+      end
+      if buy && bid_price > buy.price * 1.01 && ma_diff[-2] == ma_diff.max
+        high_sell_chain(block,buy.amount,bid_price)
       end
     end
-    high_sell_market(block,bid_price)
+    if macd_diff[-1] < 0
+      if bid_price < stock[-1] * 1.005 && ma_diff[-2] == ma_diff.min
+        high_buy_market(block,bid_price)
+      end
+      if buy && bid_price > buy.price * 1.01 && ma_diff[-2] == ma_diff.max
+        high_sell_chain(block,buy.amount,bid_price)
+      end
+    end
   end
 
   def high_buy_market(block,last_price)
@@ -83,7 +99,7 @@ private
   def high_sell_market(block,last_price)
     buy = block.high_buy_business.order(price: :asc).first
     balance = block.balance
-    if buy && balance > 0 && last_price > buy.price * 1.024
+    if buy && balance > 0 && last_price > buy.price * 1.02
       amount = balance > buy.amount ? buy.amount : balance
       high_sell_chain(block,amount,last_price)
     end
@@ -99,12 +115,11 @@ private
     bid_price = market.first['Bid']
     ask_price = market.first['Ask']
     buy_price = block.buy_price
-    if work_time
-      if bid_price < buy_price * 0.95
-        fall_price_notice(block,bid_price,buy_price)
-      elsif bid_price > buy_price * 1.05
-        high_price_notice(block,bid_price,buy_price)
-      end
+    if bid_price < buy_price * 0.95
+      fall_price_notice(block,bid_price,buy_price) if work_time
+      all_out(block,bid_price) if !work_time
+    elsif bid_price > buy_price * 1.05
+      high_price_notice(block,bid_price,buy_price) if work_time
     end
     if bid_price > high_price * 0.99
       sell_market(block,bid_price)
@@ -236,4 +251,15 @@ private
     content = "当前卖价：#{bid_price},购买成本：#{buy_price},时间：#{Time.now.strftime('%H:%M:%S')}"
     User.wechat_notice(title,content)
   end
+
+  def all_out(block,price)
+    begin
+      amount = block.balance
+      sell_chain(block,amount,price)
+      block.business.where(deal:1).destroy_all
+    rescue
+      nil
+    end
+  end
+
 end

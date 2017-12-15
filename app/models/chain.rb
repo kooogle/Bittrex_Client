@@ -204,5 +204,4 @@ class Chain < ActiveRecord::Base
     self.point.update_attributes(state:true)
   end
 
-
 end
