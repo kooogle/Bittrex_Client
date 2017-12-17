@@ -6,7 +6,7 @@ class Api::QuotesController < ApplicationController
     end
     Chain.all.each do |item|
       extremum_report(item)
-      macd_ma_business(item) if item.point && item.point.state
+      macd_business(item) if item.point && item.point.state
     end
     render json:{code:200}
   end
@@ -25,12 +25,14 @@ class Api::QuotesController < ApplicationController
   def hit_clear_business_orders
     Order.where(deal:1,repurchase:true).destroy_all
     Order.where(deal:0).destroy_all
+    render json:{code:200}
   end
 
   def hit_clear_open_orders
     Chain.all.each do |block|
       clear_open_orders(block) if block.buy_business.count > 0
     end
+    render json:{code:200}
   end
 
 private
@@ -47,9 +49,9 @@ private
     end
   end
 
-  def macd_ma_business(block)
+  def macd_business(block)
     quotes = block.tickers.last(2)
-    market = item.market
+    market = block.market
     bid_price = market.first['Bid']
     macd_diff = quotes.map {|x| x.macd_diff }
     if macd_diff[-1] > 0 && macd_diff[-2] < 0
