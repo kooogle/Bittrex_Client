@@ -76,7 +76,7 @@ private
           high_buy_market(block,bid_price)
         end
       end
-      h6_quotes = block.tickers.last(12).map { x.last_price }
+      h6_quotes = block.tickers.last(12).map { |x| x.last_price }
       if h6_quotes[-1] == h6_quotes.min && bid_price < stock[-1] * 1.005 && macd_dea_diff[-1] > 0
         high_buy_market(block,bid_price)
       end
