@@ -27,6 +27,12 @@ class Api::QuotesController < ApplicationController
     Order.where(deal:0).destroy_all
   end
 
+  def hit_clear_open_orders
+    Chain.all.each do |block|
+      clear_open_orders(block) if block.buy_business.count > 0
+    end
+  end
+
 private
 
   def extremum_report(block)
@@ -56,18 +62,23 @@ private
   def high_business(block,market)
     quotes = block.tickers.last(3)
     bid_price = market.first['Bid']
-    macd_diff = quotes.map {|x| x.macd_diff }
-    ma_diff = quotes.map {|x| x.ma5_price - x.ma10_price }
-    stock = quotes.map {|x| x.last_price }
+    macd_diff = quotes.map { |x| x.macd_diff }
+    macd_dea_diff = quotes.map { |x| x.macd_diff - x.macd_dea }
+    ma_diff = quotes.map { |x| x.ma5_price - x.ma10_price }
+    stock = quotes.map { |x| x.last_price }
     buy = block.high_buy_business.order(price: :asc).first
     high_sell_market(block,bid_price)
     if macd_diff[-1] > 0
       if bid_price < stock[-1] * 1.01
-        if ma_diff[-2] == ma_diff.min && ma_diff[-2] < 0
+        if ma_diff[-2] == ma_diff.min
           high_buy_market(block,bid_price)
         elsif ma_diff[-1] > 0 && ma_diff[-2] < 0
           high_buy_market(block,bid_price)
         end
+      end
+      6h_quotes = block.tickers.last(12).map { x.last_price }
+      if 6h_quotes[-1] == 6h_quotes.min && bid_price < stock[-1] * 1.005 && macd_dea_diff[-1] > 0
+        high_buy_market(block,bid_price)
       end
       if buy && bid_price > buy.price * 1.01 && ma_diff[-2] == ma_diff.max
         high_sell_chain(block,buy.amount,bid_price)
@@ -76,11 +87,11 @@ private
     end
     if macd_diff[-1] < 0
       if ma_diff[-2] == ma_diff.min && ma_diff[-2] < 0
-          if bid_price < stock[-1] * 1.005 
+          if bid_price < stock[-1] * 1.005
               high_buy_market(block,bid_price)
           end
       end
-      if buy && bid_price > buy.price * 1.01 && ma_diff[-2] == ma_diff.max
+      if buy && bid_price > buy.price * 1.015 && ma_diff[-2] == ma_diff.max
         high_sell_chain(block,buy.amount,bid_price)
         batch_sell_profit(block,last_price,1.015)
       end
@@ -273,11 +284,26 @@ private
       orders = block.high_buy_business.order(price: :asc)
       if orders.count > 0
           orders.each do |item|
-              if price > item.price * rate
+              if price > item.price * (rate ** 2)
                   high_sell_chain(block,item.amount,price)
               end
           end
       end
+  end
+
+  def clear_open_orders(block)
+      market = "#{block.currency}-#{block.block}"
+      open_orders = Order.pending(market)
+      open_orders['result'].each do |order|
+        cancel_order(order)
+      end
+  end
+
+  def cancel_order(order)
+    if uuid = order['OrderUuid']
+      Order.cancel(uuid)
+      Order.find_by_result(uuid).destroy rescue nil
+    end
   end
 
 end
