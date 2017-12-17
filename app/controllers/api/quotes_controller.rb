@@ -76,8 +76,8 @@ private
           high_buy_market(block,bid_price)
         end
       end
-      6h_quotes = block.tickers.last(12).map { x.last_price }
-      if 6h_quotes[-1] == 6h_quotes.min && bid_price < stock[-1] * 1.005 && macd_dea_diff[-1] > 0
+      h6_quotes = block.tickers.last(12).map { x.last_price }
+      if h6_quotes[-1] == h6_quotes.min && bid_price < stock[-1] * 1.005 && macd_dea_diff[-1] > 0
         high_buy_market(block,bid_price)
       end
       if buy && bid_price > buy.price * 1.01 && ma_diff[-2] == ma_diff.max
