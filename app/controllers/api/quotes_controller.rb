@@ -69,7 +69,6 @@ private
     ma_diff = quotes.map { |x| x.ma5_price - x.ma10_price }
     stock = quotes.map { |x| x.last_price }
     buy = block.high_buy_business.order(price: :asc).first
-    high_sell_market(block,bid_price)
     if macd_diff[-1] > 0
       if bid_price < stock[-1] * 1.01
         if ma_diff[-2] == ma_diff.min
@@ -86,6 +85,7 @@ private
         high_sell_chain(block,buy.amount,bid_price)
         batch_sell_profit(block,bid_price,1.02)
       end
+      batch_sell_profit(block,bid_price,1.045)
     end
     if macd_diff[-1] < 0
       if ma_diff[-2] == ma_diff.min && ma_diff[-2] < 0
@@ -97,6 +97,7 @@ private
         high_sell_chain(block,buy.amount,bid_price)
         batch_sell_profit(block,last_price,1.015)
       end
+      batch_sell_profit(block,bid_price,1.025)
     end
   end
 
@@ -286,7 +287,7 @@ private
       orders = block.high_buy_business.order(price: :asc)
       if orders.count > 0
           orders.each do |item|
-              if price > item.price * (rate ** 2)
+              if price > item.price * rate
                   high_sell_chain(block,item.amount,price)
               end
           end
