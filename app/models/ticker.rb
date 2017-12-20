@@ -20,7 +20,7 @@ class Ticker < ActiveRecord::Base
 
   def sync_ma_price
     if self.ma5_price.nil?
-      self.update_attributes(ma5_price:self.recent_ema(3),ma10_price:self.recent_ema(8))
+      self.update_attributes(ma5_price:self.recent_ema(5),ma10_price:self.recent_ema(15))
     end
   end
 
