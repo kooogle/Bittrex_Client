@@ -17,6 +17,10 @@ class Chain < ActiveRecord::Base
   has_one :point, class_name:'Point'
   has_one :wallet, class_name:'Balance', primary_key:'block', foreign_key:'block'
 
+  def last_price
+    self.tickers.last.last_price
+  end
+
   def full_name
     "#{self.block}-#{self.currency}"
   end
@@ -53,9 +57,13 @@ class Chain < ActiveRecord::Base
   end
 
   def to_usdt
-    return (self.market.first["Bid"]).round(2) if self.currency == 'USDT'
-    return (Chain.where(block:'ETH',currency:'USDT').first.market.first["Bid"]).round(2) if self.currency == 'ETH'
-    return (Chain.where(block:'BTC',currency:'USDT').first.market.first["Bid"]).round(2) if self.currency == 'BTC'
+    if self.currency == 'USDT'
+      return (self.market.first["Bid"]).round(2)
+    elsif self.currency == 'ETH'
+      return ((Chain.where(block:'ETH',currency:'USDT').first.market.first["Bid"]) * self.last_price).round(2)
+    elsif self.currency == 'BTC'
+      return ((Chain.where(block:'BTC',currency:'USDT').first.market.first["Bid"]) * self.last_price).round(2)
+    end
   end
 
   def markets

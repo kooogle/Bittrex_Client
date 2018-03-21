@@ -5,8 +5,7 @@ class Api::QuotesController < ApplicationController
       item.generate_ticker rescue nil
     end
     Chain.all.each do |item|
-      extremum_report(item)
-      macd_business(item) if item.point && item.point.state
+      extremum_report(item) if item.point && item.point.state
     end
     render json:{code:200}
   end
@@ -39,13 +38,13 @@ class Api::QuotesController < ApplicationController
 private
 
   def extremum_report(block)
-    quotes = block.tickers.last(48)
+    quotes = block.tickers.last(96)
     td_quotes = quotes.map {|x| x.last_price}
     if td_quotes.max == td_quotes[-1]
-      chain_up_notice(block)
+      # chain_up_notice(block)
       up_sms_notice(block) if work_time
     elsif td_quotes.min == td_quotes[-1]
-      chain_down_notice(block)
+      # chain_down_notice(block)
       down_sms_notice(block) if work_time
     end
   end
@@ -227,12 +226,12 @@ private
   end
 
   def up_sms_notice(block)
-    content = "#{block.block} 最高价值，价格: #{block.tickers.last.last_price} USDT, 时间: #{Time.now.strftime('%F %H:%M')}"
+    content = "#{block.block} 最高价值，价格: #{block.tickers.last.last_price} #{block.currency}, 价值: #{block.to_usdt} USDT"
     User.sms_notice(content)
   end
 
   def down_sms_notice(block)
-    content = "#{block.block} 最低价值，价格: #{block.tickers.last.last_price} USDT, 时间: #{Time.now.strftime('%F %H:%M')}"
+    content = "#{block.block} 最低价值，价格: #{block.tickers.last.last_price} #{block.currency}, 价值: #{block.to_usdt} USDT"
     User.sms_notice(content)
   end
 
