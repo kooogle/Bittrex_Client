@@ -8,7 +8,7 @@ class Blocks::DashboardController < Blocks::BaseController
     tickers = @block.tickers.where("mark >= ? AND mark <= ?",sta_time,end_time)
     tickers = @block.tickers.where("id <= ?", tickers.last.id).last(96) if tickers.count < 96 && tickers.count > 0
     tickers = @block.tickers.last(96) if tickers.count == 0
-    @date_array = tickers.map {|x| x.created_at.strftime('%d%H')}
+    @date_array = tickers.map {|x| x.created_at.strftime('%d %H:%M')}
     @last_price = tickers.map {|x| x.last_price }
     @macd_diff = tickers.map {|x| x.macd_diff}
     @macd_dea = tickers.map {|x| x.macd_dea}

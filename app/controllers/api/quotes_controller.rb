@@ -1,5 +1,5 @@
 class Api::QuotesController < ApplicationController
-  #每30分钟获取一直价格，生成历史行情
+  #每15分钟获取一次格，生成历史行情
   def hit_tickers
     Chain.all.each do |item|
       item.generate_ticker rescue nil
