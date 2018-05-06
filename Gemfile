@@ -21,6 +21,7 @@ gem 'cancancan', '1.15.0' # User authorization
 gem 'devise','3.4.0' # User authentication
 gem 'nokogiri', '1.8.0' # HTML 解析
 gem 'bittrex', '0.0.1'
+gem 'daemons-rails', '1.2.1'
 
 group :development do
   gem 'spring', '2.0.0' # bin/bundle exec spring binstub --all

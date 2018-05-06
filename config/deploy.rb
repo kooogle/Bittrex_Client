@@ -27,6 +27,7 @@ set :linked_dirs, %w{
   tmp/cache
   tmp/pids
   tmp/sockets
+  tmp/logs
   public/logger
   public/uploads
 }
@@ -60,6 +61,35 @@ namespace :deploy do
     end
   end
 
-  after 'deploy:migrate', 'deploy:restart'
-
 end
+
+namespace :daemons do
+  desc "开启进程"
+  task start: :environment do
+    queue %{
+      cd #{deploy_to}/current
+      RAILS_ENV=production bundle exec ./bin/rake daemons:start
+      echo Daemons START DONE!!!
+    }
+  end
+
+  desc "停止进程"
+  task stop: :environment do
+    queue %{
+      cd #{deploy_to}/current
+      RAILS_ENV=production bundle exec ./bin/rake daemons:stop
+      echo Daemons STOP DONE!!!
+    }
+  end
+
+  desc "进程状态"
+  task status: :environment do
+    queue %{
+      cd #{deploy_to}/current
+      RAILS_ENV=production bundle exec ./bin/rake daemons:status
+    }
+  end
+end
+
+after 'deploy:migrate', 'deploy:restart'
+

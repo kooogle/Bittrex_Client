@@ -17,22 +17,31 @@ class Chain < ActiveRecord::Base
   has_one :point, class_name:'Point'
   has_one :wallet, class_name:'Balance', primary_key:'block', foreign_key:'block'
 
+
+  def self.amplitude(old_price,new_price)
+    return ((new_price - old_price) / old_price.to_f * 100).to_i
+  end
+
   def last_price
-    self.tickers.last.last_price
+    tickers.last.last_price
   end
 
   def full_name
-    "#{self.block}-#{self.currency}"
+    "#{block}-#{currency}"
+  end
+
+  def point_state
+    point.try(:state)
   end
 
   def buy_cost
-    cost = self.buy_business.map {|x| x.total }.sum
+    cost = buy_business.map {|x| x.total }.sum
     return cost.round(2) if cost > 0
     '一'
   end
 
   def buy_price
-    buy_business = self.buy_business
+    buy_business = buy_business
     if buy_business.count > 0
       price = buy_business.map {|x| x.total }.sum / buy_business.map {|x| x.amount }.sum
       return price.round(2)
@@ -40,41 +49,43 @@ class Chain < ActiveRecord::Base
     '一'
   end
 
+  #获取实时的人民币/美元汇率
+  # finance_url = 'https://finance.yahoo.com/webservice/v1/symbols/allcurrencies/quote?format=json'
+  # res = Faraday.get(finance_url)
+  # finances = JSON.parse(res.body)
+  # finances['list']['resources'].each do |item|
+  #   if item['resource']['fields']['name'] == 'USD/CNY'
+  #     cny_finance = item['resource']['fields']['price'].to_f
+  #   end
+  # end
+
   def to_cny
-    # finance_url = 'https://finance.yahoo.com/webservice/v1/symbols/allcurrencies/quote?format=json'
-    # res = Faraday.get(finance_url)
-    # finances = JSON.parse(res.body)
-    # finances['list']['resources'].each do |item|
-    #   if item['resource']['fields']['name'] == 'USD/CNY'
-    #     cny_finance = item['resource']['fields']['price'].to_f
-    #   end
-    # end
     cny_finance = 6.6375
-    return (cny_finance * self.quote["Last"]).round(2) if self.currency == 'USDT'
-    return (cny_finance * Chain.where(block:'ETH',currency:'USDT').first.quote["Last"]).round(2) if self.currency == 'ETH'
-    return (cny_finance * Chain.where(block:'BTC',currency:'USDT').first.quote["Last"]).round(2) if self.currency == 'BTC'
+    return (cny_finance * quote["Last"]).round(2) if currency == 'USDT'
+    return (cny_finance * Chain.where(block:'ETH',currency:'USDT').first.quote["Last"]).round(2) if currency == 'ETH'
+    return (cny_finance * Chain.where(block:'BTC',currency:'USDT').first.quote["Last"]).round(2) if currency == 'BTC'
     cny_finance
   end
 
   def to_usdt
-    if self.currency == 'USDT'
-      return (self.market.first["Bid"]).round(2)
-    elsif self.currency == 'ETH'
-      return ((Chain.where(block:'ETH',currency:'USDT').first.market.first["Bid"]) * self.last_price).round(2)
-    elsif self.currency == 'BTC'
-      return ((Chain.where(block:'BTC',currency:'USDT').first.market.first["Bid"]) * self.last_price).round(2)
+    if currency == 'USDT'
+      return (market["Bid"]).round(2)
+    elsif currency == 'ETH'
+      return ((Chain.where(block:'ETH',currency:'USDT').first.market["Bid"]) * last_price).round(2)
+    elsif currency == 'BTC'
+      return ((Chain.where(block:'BTC',currency:'USDT').first.market["Bid"]) * last_price).round(2)
     end
   end
 
   def markets
-    "#{self.currency}-#{self.block}"
+    "#{currency}-#{block}"
   end
 
   def quote
     ticker_url = 'https://bittrex.com/api/v1.1/public/getticker'
     res = Faraday.get do |req|
       req.url ticker_url
-      req.params['market'] = self.markets
+      req.params['market'] = markets
     end
     current = JSON.parse(res.body)
     current['result']
@@ -84,16 +95,16 @@ class Chain < ActiveRecord::Base
     market_url = 'https://bittrex.com/api/v1.1/public/getmarketsummary'
     res = Faraday.get do |req|
       req.url market_url
-      req.params['market'] = self.markets
+      req.params['market'] = markets
     end
     current = JSON.parse(res.body)
-    current['result']
+    current['result'][0]
   end
 
   def generate_ticker
-    quote = self.market.first
+    quote = market
     ticker = Ticker.new
-    ticker.chain_id = self.id
+    ticker.chain_id = id
     ticker.last_price = quote['Last']
     ticker.volume = quote['Volume']
     ticker.mark = Date.current.to_s
@@ -103,43 +114,43 @@ class Chain < ActiveRecord::Base
   def balance
     balance_url = 'https://bittrex.com/api/v1.1/account/getbalance'
     timetamp = Time.now.to_i
-    sign_url = "#{balance_url}?apikey=#{Settings.apiKey}&currency=#{self.block}&nonce=#{timetamp}"
+    sign_url = "#{balance_url}?apikey=#{Settings.apiKey}&currency=#{block}&nonce=#{timetamp}"
     res = Faraday.get do |req|
       req.url balance_url
       req.headers['apisign'] = Dashboard.hamc_digest(sign_url)
       req.params['apikey'] = Settings.apiKey
-      req.params['currency'] = self.block
+      req.params['currency'] = block
       req.params['nonce'] = timetamp
     end
     result = JSON.parse(res.body)
     availiable = result['result']['Available']
-    self.clear_buy_order if availiable == 0 || availiable.nil?
+    clear_buy_order if availiable == 0 || availiable.nil?
     availiable
   end
 
   def clear_buy_order
-    self.business.where(repurchase:false,deal:1).destroy_all
+    business.where(repurchase:false,deal:1).destroy_all
   end
 
   def money
     balances = Balance.sync_all
     balances.each do |balance|
-      if balance['Currency'] == self.currency.to_s
+      if balance['Currency'] == currency.to_s
         return balance['Available']
       end
     end
   end
 
   def greater_income
-    self.last_buy_price + self.point.income
+    last_buy_price + point.income
   end
 
   def income
-    self.point.income
+    point.income
   end
 
   def last_buy_price
-    if buy = self.low_buy_business.last(5)
+    if buy = low_buy_business.last(5)
       buy_array = buy.map {|x| x.price }
       buy_average = buy_array.sum / buy_array.size
       return buy_average.to_i if buy_average.to_i > 0
@@ -149,67 +160,79 @@ class Chain < ActiveRecord::Base
   end
 
   def high
-    self.tickers.last(48).map {|x| x.last_price}.max
+    tickers.last(96).map {|x| x.last_price}.max
   end
 
   def low
-    self.tickers.last(48).map {|x| x.last_price}.min
+    tickers.last(96).map {|x| x.last_price}.min
   end
 
   def high_nearby(price)
-    return true if self.high * 0.99382 < price && self.high > price
+    return true if high * 0.99382 < price && high > price
     false
   end
 
   def low_nearby(price)
-    return true if self.low < price && self.low * 1.00618 > price
+    return true if low < price && low * 1.00618 > price
     false
   end
 
   def ma_up_down_point?
-    ma_gap = self.tickers.last(5).map {|x| (x.ma5_price - x.ma10_price).round(8)}
+    ma_gap = tickers.last(5).map {|x| (x.ma5_price - x.ma10_price).round(8)}
     return true if ma_gap.min > 0 && ma_gap.max == ma_gap[-2]
     false
   end
 
   def ma_down_up_point?
-    ma_gap = self.tickers.last(5).map {|x| (x.ma5_price - x.ma10_price).round(8)}
+    ma_gap = tickers.last(5).map {|x| (x.ma5_price - x.ma10_price).round(8)}
     return true if ma_gap.max < 0 && ma_gap.min == ma_gap[-2]
     false
   end
 
   def kling_up_down_point?
-    ling = self.tickers.last(24).map {|x| x.last_price}
+    ling = tickers.last(24).map {|x| x.last_price}
     return true if ling.max == [-2]
     false
   end
 
   def kling_down_up_point?
-    ling = self.tickers.last(24).map {|x| x.last_price}
+    ling = tickers.last(24).map {|x| x.last_price}
     return true if ling.min == [-2]
     false
   end
 
   def market_rise?
-    last_1_day_max = self.tickers.where(mark:(Date.current - 1.day).to_s).map {|x| x.last_price}.max
-    last_2_day_max = self.tickers.where(mark:(Date.current - 2.day).to_s).map {|x| x.last_price}.max
+    last_1_day_max = tickers.where(mark:(Date.current - 1.day).to_s).map {|x| x.last_price}.max
+    last_2_day_max = tickers.where(mark:(Date.current - 2.day).to_s).map {|x| x.last_price}.max
     return true if last_1_day_max > last_2_day_max
     false
   end
 
   def market_fall?
-    last_1_day_min = self.tickers.where(mark:(Date.current - 1.day).to_s).map {|x| x.last_price}.min
-    last_2_day_min = self.tickers.where(mark:(Date.current - 2.day).to_s).map {|x| x.last_price}.min
+    last_1_day_min = tickers.where(mark:(Date.current - 1.day).to_s).map {|x| x.last_price}.min
+    last_2_day_min = tickers.where(mark:(Date.current - 2.day).to_s).map {|x| x.last_price}.min
     return true if last_2_day_min > last_1_day_min
     false
   end
 
   def close_merch
-    self.point.update_attributes(state:false)
+    point.update_attributes(state:false)
   end
 
   def open_merch
-    self.point.update_attributes(state:true)
+    point.update_attributes(state:true)
+  end
+
+  def bull_market_tip(magnitude,ticker)
+    title = "#{block} 牛市归来"
+    content = "涨幅 #{magnitude}口价格 #{ticker['Last']}口时间 #{Time.now.strftime('%F %H:%M')}"
+    User.wechat_group_notice(title,content)
+  end
+
+  def bear_market_tip(magintude,ticker)
+    title = "#{block} 熊市来袭"
+    content = "跌幅 -#{magnitude}口价格 #{ticker['Last']}口时间 #{Time.now.strftime('%F %H:%M')}"
+    User.wechat_group_notice(title,content)
   end
 
 end

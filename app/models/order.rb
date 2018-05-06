@@ -27,92 +27,92 @@ class Order < ActiveRecord::Base
   end
 
   def dealing
-    {0=>'SELL',1=>'BUY'}[self.deal]
+    {0=>'SELL',1=>'BUY'}[deal]
   end
 
   def stating
-    {true=>'已挂单',false=>'未激活'}[self.state]
+    {true=>'已挂单',false=>'未激活'}[state]
   end
 
   def frequency_cn
-    {true=>'高频',false=>'低频'}[self.frequency]
+    {true=>'高频',false=>'低频'}[frequency]
   end
 
   def repurchase_cn
-    {true=>'已出单',false=>'未回购'}[self.repurchase]
+    {true=>'已出单',false=>'未回购'}[repurchase]
   end
 
   def show_repurchase_cn
-    return self.repurchase_cn if self.buy?
+    return repurchase_cn if buy?
   end
 
   def shown_time
-    if Time.now - self.created_at > 1.day
-      time_ago_in_words self.created_at
+    if Time.now - created_at > 1.day
+      time_ago_in_words created_at
     else
-      self.created_at.strftime('%H:%M:%S')
+      created_at.strftime('%H:%M:%S')
     end
   end
 
   def calculate_total
-    if self.total.nil?
-      total = self.amount * self.price
-      self.update_attributes(total: total.round(2))
+    if total.nil?
+      total = amount * price
+      update_attributes(total: total.round(2))
     end
   end
 
   def buy?
-    return true if self.deal == 1
+    return true if deal == 1
   end
 
   def sell?
-    return true if self.deal == 0
+    return true if deal == 0
   end
 
   def sync_remote_order
-    if self.state.nil?
+    if state.nil?
       result = {}
-      if self.buy?
-        result = self.remote_buy_order rescue {}
-      elsif self.sell?
-        result = self.remote_sell_order rescue {}
+      if buy?
+        result = remote_buy_order rescue {}
+      elsif sell?
+        result = remote_sell_order rescue {}
       end
       if result['success']
-        self.update_attributes(state:true, result:result['result']['uuid'])
-        self.sync_repurchase rescue {} if self.sell? #卖出执行回单
-        # self.change_point_profit rescue {} unless self.frequency #低频买卖才同步
+        update_attributes(state:true, result:result['result']['uuid'])
+        sync_repurchase rescue {} if sell? #卖出执行回单
+        # change_point_profit rescue {} unless frequency #低频买卖才同步
         return true
       end
-      self.update_attributes(state:false, result:result['message'])
+      update_attributes(state:false, result:result['message'])
     end
   end
 
   def remote_buy_order
     buy_url = 'https://bittrex.com/api/v1.1/market/buylimit'
-    self.remote_order(buy_url)
+    remote_order(buy_url)
   end
 
   def remote_sell_order
     sell_url = 'https://bittrex.com/api/v1.1/market/selllimit'
-    self.remote_order(sell_url)
+    remote_order(sell_url)
   end
 
   def sign_query(timetamp)
-    query_arry = ["apikey=#{Settings.apiKey}","market=#{self.chain.markets}","nonce=#{timetamp}","quantity=#{self.amount}","rate=#{self.price}"]
+    query_arry = ["apikey=#{Settings.apiKey}","market=#{chain.markets}","nonce=#{timetamp}","quantity=#{amount}","rate=#{price}"]
     query_arry.sort.join('&')
   end
 
   def remote_order(deal_url)
     timetamp = Time.now.to_i
-    sign_url = "#{deal_url}?#{self.sign_query(timetamp)}"
+    sign_url = "#{deal_url}?#{sign_query(timetamp)}"
     res = Faraday.get do |req|
       req.url deal_url
       req.headers['apisign'] = Dashboard.hamc_digest(sign_url)
       req.params['apikey'] = Settings.apiKey
-      req.params['market'] = self.chain.markets
+      req.params['market'] = chain.markets
       req.params['nonce'] = timetamp
-      req.params['quantity'] = self.amount
-      req.params['rate'] = self.price
+      req.params['quantity'] = amount
+      req.params['rate'] = price
     end
     result = JSON.parse(res.body)
   end
@@ -146,32 +146,33 @@ class Order < ActiveRecord::Base
   end
 
   def change_point_profit
-    if self.buy?
-      self.reset_profit
-    elsif self.sell?
-      self.increase_profit
+    if buy?
+      reset_profit
+    elsif sell?
+      increase_profit
     end
   end
 
   def reset_profit
     finance = 0.0618
-    fund = self.chain.last_buy_price
+    fund = chain.last_buy_price
     actual = finance * fund
-    self.chain.point.update_attributes(income:actual.to_i)
+    chain.point.update_attributes(income:actual.to_i)
   end
 
   def increase_profit
     finance = 0.00618
-    fund = self.chain.market.first['Bid']
-    actual = self.chain.point.income + finance * fund
-    self.chain.point.update_attributes(income:actual.to_i)
+    fund = chain.market['Bid']
+    actual = chain.point.income + finance * fund
+    chain.point.update_attributes(income:actual.to_i)
   end
 
+  #交易完成后同步订单的
   def sync_repurchase
-    if self.frequency
-      self.chain.high_buy_business.order(price: :asc).first.update_attributes(repurchase:true)
+    if frequency
+      chain.high_buy_business.order(price: :asc).first.update_attributes(repurchase:true)
     else
-      self.chain.low_buy_business.first.update_attributes(repurchase:true)
+      chain.low_buy_business.first.update_attributes(repurchase:true)
     end
   end
 

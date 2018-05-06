@@ -51,7 +51,7 @@ class Api::StocksController < ApplicationController
     ava_money = block.money
     if ava_money > 1
       chain_money = block.point.total_value
-      price = block.market.first['Ask']
+      price = block.market['Ask']
       buy_money = ava_money * 0.9975 > chain_money ? chain_money : ava_money * 0.9975
       amount = buy_money.to_i / price
       amount = amount > 1 ? amount.to_d.round(5,:truncate).to_f : amount.to_d.round(5,:truncate).to_f
@@ -65,7 +65,7 @@ class Api::StocksController < ApplicationController
     balance = block.balance
     buy = block.low_buy_business.first
     buy = block.high_buy_business.first if buy.nil?
-    price = block.market.first['Bid']
+    price = block.market['Bid']
     if balance > 0
       if buy
         amount = balance > buy.amount ? buy.amount : balance

@@ -52,7 +52,7 @@ private
   def macd_business(block)
     quotes = block.tickers.last(2)
     market = block.market
-    bid_price = market.first['Bid']
+    bid_price = market['Bid']
     macd_diff = quotes.map {|x| x.macd_diff }
     if macd_diff[-1] > 0 && macd_diff[-2] < 0
       buy_down_chain(block,bid_price)
@@ -62,9 +62,9 @@ private
   end
 
   def quote_analysis(block,market)
-    high_price = market.first['High']
-    low_price = market.first['Low']
-    bid_price = market.first['Bid']
+    high_price = market['High']
+    low_price = market['Low']
+    bid_price = market['Bid']
     buy_price = block.buy_price
     quotes_3 = block.tickers.last(3).map {|x| x.last_price}
     if bid_price < buy_price * 0.95
@@ -84,7 +84,7 @@ private
 
   def high_business(block,market)
     quotes = block.tickers.last(7)
-    bid_price = market.first['Bid']
+    bid_price = market['Bid']
     macd_diff = quotes.map { |x| x.macd_diff }
     macd_dea_diff = quotes.map { |x| x.macd_diff - x.macd_dea }
     ma_diff = quotes.map { |x| x.ma5_price - x.ma10_price }

@@ -46,7 +46,7 @@ class Blocks::BalancesController < Blocks::BaseController
     if @balance.chain
       block = @balance.chain
       amount = block.balance
-      price = block.market.first["Bid"]
+      price = block.market["Bid"]
       if amount > 0 && price > 0
         sell_chain(block,amount,price)
         block.business.where(deal:1).destroy_all

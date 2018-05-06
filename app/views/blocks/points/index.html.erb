@@ -19,12 +19,10 @@
           <table id="example1" class="table table-bordered table-striped dataTable" role="grid" aria-describedby="example1_info">
             <thead>
             <tr>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">区块</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">低总价</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">低单价</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">溢价</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">高买价</th>
-              <th tabindex="0" aria-controls="example1" style="text-align: center">高总值</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">数字货币</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">收益比重</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">交易数量</th>
+              <th tabindex="0" aria-controls="example1" style="text-align: center">持有成本</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center">状态</th>
               <th tabindex="0" aria-controls="example1" style="text-align: center;">操作</th>
             </tr>
@@ -38,11 +36,9 @@
                     <%= item.chain.full_name %>
                   </label>
                 </td>
+                <td><%= item.weights %></td>
+                <td><%= item.unit %></td>
                 <td><%= item.total_value %></td>
-                <td><%= item.low_price %></td>
-                <td><%= item.income %></td>
-                <td><%= item.high_price %></td>
-                <td><%= item.high_value %></td>
                 <td>
                   <input type="checkbox" name="my-state" <%= 'checked' if item.state %> onchange='switch_state(<%= item.id %>)'>
                 </td>

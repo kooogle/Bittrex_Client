@@ -72,6 +72,10 @@ GEM
     coffee-script-source (1.12.2)
     concurrent-ruby (1.0.5)
     connection_pool (2.2.1)
+    daemons (1.2.6)
+    daemons-rails (1.2.1)
+      daemons
+      multi_json (~> 1.0)
     database_cleaner (1.5.1)
     devise (3.4.0)
       bcrypt (~> 3.0)
@@ -326,6 +330,7 @@ DEPENDENCIES
   capistrano3-puma (= 1.2.1)
   capsum (= 1.0.4)
   coffee-rails (= 4.2.1)
+  daemons-rails (= 1.2.1)
   database_cleaner (= 1.5.1)
   devise (= 3.4.0)
   factory_girl_rails (= 4.6.0)
