@@ -60,36 +60,23 @@ namespace :deploy do
       end
     end
   end
-
 end
 
 namespace :daemons do
   desc "开启进程"
-  task start: :environment do
-    queue %{
-      cd #{deploy_to}/current
-      RAILS_ENV=production bundle exec ./bin/rake daemons:start
-      echo Daemons START DONE!!!
-    }
+  task :start do
+    %x("RAILS_ENV=production rake daemons:start")
   end
 
   desc "停止进程"
-  task stop: :environment do
-    queue %{
-      cd #{deploy_to}/current
-      RAILS_ENV=production bundle exec ./bin/rake daemons:stop
-      echo Daemons STOP DONE!!!
-    }
+  task :stop do
+    %x("RAILS_ENV=production rake daemons:stop")
   end
 
   desc "进程状态"
-  task status: :environment do
-    queue %{
-      cd #{deploy_to}/current
-      RAILS_ENV=production bundle exec ./bin/rake daemons:status
-    }
+  task :status do
+    %x("RAILS_ENV=production rake daemons:status")
   end
 end
 
-after 'deploy:migrate', 'deploy:restart'
-
+after 'deploy:finished', 'daemons:stop', 'daemons:start'
