@@ -65,17 +65,26 @@ end
 namespace :daemons do
   desc "开启进程"
   task :start do
-    %x("RAILS_ENV=production rake daemons:start")
+    on roles(:web) do
+      within release_path do
+        with rails_env: fetch(:rails_env) do
+          execute :rake, 'daemons:start'
+          info "开启后台进程..."
+        end
+      end
+    end
   end
 
   desc "停止进程"
   task :stop do
-    %x("RAILS_ENV=production rake daemons:stop")
-  end
-
-  desc "进程状态"
-  task :status do
-    %x("RAILS_ENV=production rake daemons:status")
+    on roles(:web) do
+      within release_path do
+        with rails_env: fetch(:rails_env) do
+          execute :rake, 'daemons:stop'
+          info "停止后台进程..."
+        end
+      end
+    end
   end
 end
 

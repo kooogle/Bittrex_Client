@@ -20,7 +20,7 @@ while($running) do
     ticker = block.market rescue nil
     day_price = ticker['PrevDay']
     last_price = ticker['Last']
-    weights = block.point.try(:weights) || 10
+    weights = block.point.try(:weights) || 5
     magnitude = Chain.amplitude(day_price,last_price)
     if magnitude > weights
       block.bull_market_tip(magnitude,ticker)
