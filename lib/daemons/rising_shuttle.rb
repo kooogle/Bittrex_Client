@@ -20,10 +20,10 @@ while($running) do
   Chain.all.each do |block|
     begin
       ticker = block.market
-      prev_price = block.prev_day_price ||ticker['PrevDay']
+      prev_price = block.prev_day_price || ticker['PrevDay']
       last_price = ticker['Last']
       point = block.point || block.build_point(weights:1)
-      if reset_time > 800 && reset_time < 804
+      if 800 < reset_time && reset_time < 804
         point.update_attributes(weights:1)
       end
       weights = point.weights
@@ -34,6 +34,7 @@ while($running) do
       elsif magnitude <= -weights
         block.bear_market_tip(magnitude,ticker)
         point.increment(:weights)
+      end
     rescue Exception => e
       Rails.logger.fatal e
     end
