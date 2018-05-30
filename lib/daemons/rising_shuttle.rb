@@ -16,17 +16,27 @@ Signal.trap('TERM') do
 end
 
 while($running) do
+  reset_time = Time.now.strftime("%H%M").to_i
   Chain.all.each do |block|
-    ticker = block.market rescue nil
-    day_price = ticker['PrevDay']
-    last_price = ticker['Last']
-    weights = block.point.try(:weights) || 5
-    magnitude = Chain.amplitude(day_price,last_price)
-    if magnitude > weights
-      block.bull_market_tip(magnitude,ticker)
-    elsif magnitude < -weights
-      block.bear_market_tip(magnitude,ticker)
+    begin
+      ticker = block.market
+      prev_price = block.prev_day_price ||ticker['PrevDay']
+      last_price = ticker['Last']
+      point = block.point || block.build_point(weights:1)
+      if reset_time > 800 && reset_time < 804
+        point.update_attributes(weights:1)
+      end
+      weights = point.weights
+      magnitude = Chain.amplitude(prev_price,last_price)
+      if magnitude >= weights
+        block.bull_market_tip(magnitude,ticker)
+        point.increment(:weights)
+      elsif magnitude <= -weights
+        block.bear_market_tip(magnitude,ticker)
+        point.increment(:weights)
+    rescue Exception => e
+      Rails.logger.fatal e
     end
   end
-  sleep 60
+  sleep 180
 end

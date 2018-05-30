@@ -40,6 +40,15 @@ class Chain < ActiveRecord::Base
     '一'
   end
 
+  def prev_day_price
+    last_day = tickers.where(mark:Date.current.yesterday).map(&:last_price)
+    if last_day.any?
+      (last_day.max + last_day.min) / 2.0
+    else
+      return nil
+    end
+  end
+
   def buy_price
     buy_business = buy_business
     if buy_business.count > 0
@@ -231,7 +240,7 @@ class Chain < ActiveRecord::Base
 
   def bear_market_tip(magintude,ticker)
     title = "#{block} 熊市来袭"
-    content = "跌幅 -#{magnitude}口价格 #{ticker['Last']}口时间 #{Time.now.strftime('%F %H:%M')}"
+    content = "跌幅 -#{magintude}口价格 #{ticker['Last']}口时间 #{Time.now.strftime('%F %H:%M')}"
     User.wechat_group_notice(title,content)
   end
 
