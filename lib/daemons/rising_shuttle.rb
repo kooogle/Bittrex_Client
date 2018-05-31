@@ -32,7 +32,7 @@ while($running) do
       if magnitude >= weights
         block.bull_market_tip(magnitude,ticker)
         point.increment!(:weights)
-      elsif magnitude.abs >= weights
+      elsif magnitude < 0 && magnitude.abs >= weights
         block.bear_market_tip(magnitude,ticker)
         point.increment!(:weights)
       end

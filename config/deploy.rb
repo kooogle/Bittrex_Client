@@ -88,5 +88,5 @@ namespace :daemons do
   end
 end
 
-after 'deploy:finished', 'daemons:stop'
-after 'daemons:stop','daemons:start'
+# after 'deploy:finished', 'daemons:stop'
+# after 'daemons:stop','daemons:start'
