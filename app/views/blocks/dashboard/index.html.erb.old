@@ -1,4 +1,7 @@
 <%= content_for(:title,  'K-Line | Block') %>
+<%= content_for :script do %>
+  <%= javascript_include_tag 'chart', 'data-turbolinks-track' => true %>
+<% end %>
 <section class="content-header">
   <h1>
     <%= @block.full_name %>行情  <small>信息预览</small>
@@ -47,19 +50,76 @@
     <div class="box-body">
       <div class="row">
         <div class="col-sm-12">
-          <div id="price-chart" class="chart-container"></div>
-          <div id="macd-chart" class="chart-container"></div>
+          <canvas id="myChart"></canvas>
+          <canvas id="myMacd"></canvas>
         </div>
       </div>
     </div>
   </div>
 </section>
-<%= content_for :script_footer do %>
-  <%= javascript_include_tag 'highcharts','price-charts', 'data-turbolinks-track' => true %>
-  <script type="text/javascript">
-    $( document ).ready(function() {
-      drawPrice(<%= raw @price_array %>, "<%= @block.currency.downcase %>");
-      drawMacd(<%= raw @macd_diff %>,<%= raw @macd_dea %>,<%= raw @macd_bar %>,<%= raw @date_data %>);
-    });
-  </script>
-<% end %>
+<script type="text/javascript">
+  var ctx = document.getElementById("myChart").getContext('2d');
+  var myLineChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: <%= raw @date_array %>,
+        datasets: [
+          {
+            label: "市价 线",
+            data: <%= @last_price.compact %>,
+            fill: false,
+            pointRadius: 0,
+            backgroundColor: 'rgba(63,43,54,0.2)',
+            borderColor: 'rgba(63,43,54, 1)',
+            lineTension: 0.15
+          }
+        ]
+      },
+      options: {
+        duration: 200,
+        title: {
+          display: true,
+          fontSize: 18,
+          fontColor: 'rgba(246, 81, 29, 1)',
+          text: "<%= @block.full_name %> K-Line"
+        }
+      }
+  });
+  var ctx1 = document.getElementById("myMacd").getContext('2d');
+  var myLineChart1 = new Chart(ctx1, {
+    type: 'line',
+    data: {
+      labels: <%= raw @date_array %>,
+      datasets: [
+      {
+          label: "DIF 线",
+          data: <%= @macd_diff.compact %>,
+          fill: false,
+          pointRadius: 0,
+          backgroundColor: 'rgba(27,129,62,0.2)',
+          borderColor: 'rgba(27,129,62, 1)',
+          lineTension: 0.15
+        },
+        {
+          label: "DEA 线",
+          data: <%= @macd_dea.compact %>,
+          fill: false,
+          pointRadius: 0,
+          backgroundColor: 'rgba(203, 27, 69,0.2)',
+          borderColor: 'rgba(203, 27, 69, 1)',
+          lineTension: 0.15
+        },
+        {
+          label: "MAD 线",
+          data: <%= @ma_diff.compact %>,
+          fill: true,
+          pointRadius: 0,
+          backgroundColor: 'rgba(102, 102, 102,0.2)',
+          borderColor: 'rgba(102, 102, 102, 1)',
+          lineTension: 0.15
+        }
+      ]
+    },
+    options: {duration: 200}
+  });
+</script>

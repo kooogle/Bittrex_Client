@@ -6,4 +6,4 @@
 
     bundle exec rake daemon:rising_shuttle:start RAILS_ENV=production
 
-    tail -f tmp/logs/rising_shuttle.rb.output -f
+    tail tmp/logs/rising_shuttle.rb.output -f
