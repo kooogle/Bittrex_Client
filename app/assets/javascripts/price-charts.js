@@ -22,8 +22,8 @@ function drawPrice(data, ticker) {
             formatter: function() {
                 if (this.value > 1 || this.value < -1 || this.value == 0) {
                     return BigNumber(this.value).round(2, BigNumber.ROUND_DOWN).toF(2);
-                } else if (this.value < 0.1 && this.value > 0){
-                    return BigNumber(this.value).round(2, BigNumber.ROUND_DOWN).toF(4);
+                } else if (this.value < 1 && this.value > 0){
+                    return BigNumber(this.value).round(4, BigNumber.ROUND_DOWN).toF(4);
                 }
             }
         }
@@ -71,8 +71,8 @@ function drawMacd(diff_data,dea_data,bar_data,date_data) {
                 formatter: function() {
                     if (this.value > 1 || this.value < -1 || this.value == 0) {
                         return BigNumber(this.value).round(2, BigNumber.ROUND_DOWN).toF(2);
-                    } else if (this.value < 0.1 && this.value > 0){
-                        return BigNumber(this.value).round(2, BigNumber.ROUND_DOWN).toF(4);
+                    } else if (this.value < 1 && this.value > 0 || this.value > -1 && this.value < 0){
+                        return BigNumber(this.value * 10000).round(4, BigNumber.ROUND_DOWN).toF(4);
                     }
                 }
             }
