@@ -9,9 +9,9 @@ class Blocks::DashboardController < Blocks::BaseController
     tickers = @block.tickers.last(96) if tickers.count < 97
     @price_array = tickers.map {|x| [x.created_at.to_i * 1000,x.last_price] }
     @date_data = tickers.map {|x| x.created_at.to_i * 1000 }
-    @macd_diff = tickers.map {|x| x.macd_diff}
-    @macd_dea = tickers.map {|x| x.macd_dea}
-    @macd_bar = tickers.map {|x| x.macd_bar / 2}
+    @macd_diff = tickers.map {|x| x.macd_diff }
+    @macd_dea = tickers.map {|x| x.macd_dea }
+    @macd_bar = tickers.map {|x| x.macd_bar / 2 }
   end
 
   def index_old
