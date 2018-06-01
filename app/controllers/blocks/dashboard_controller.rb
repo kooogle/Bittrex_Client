@@ -2,12 +2,11 @@ class Blocks::DashboardController < Blocks::BaseController
 
   def index
     block = params[:block] || Chain.first.id
-    sta_time = params[:start] || Date.current.to_s
+    sta_time = params[:start] || (Date.current - 2.days).to_s
     end_time = params[:end] || Date.current.to_s
     @block = Chain.find(block)
     tickers = @block.tickers.where("mark >= ? AND mark <= ?",sta_time,end_time)
-    tickers = @block.tickers.where("id <= ?", tickers.last.id).last(96) if tickers.count < 96 && tickers.count > 0
-    tickers = @block.tickers.last(96) if tickers.count == 0
+    tickers = @block.tickers.last(96) if tickers.count < 97
     @price_array = tickers.map {|x| [x.created_at.to_i * 1000,x.last_price] }
     @date_data = tickers.map {|x| x.created_at.to_i * 1000 }
     @macd_diff = tickers.map {|x| x.macd_diff}

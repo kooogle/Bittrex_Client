@@ -53,8 +53,9 @@ function drawMacd(diff_data,dea_data,bar_data,date_data) {
             type: 'datetime',
             labels:{
                 formatter: function(){
-                    var date = new Date(this.value);
-                    return date.getMonth() + "-" + date.getDate();
+                    return '';
+                    // var date = new Date(this.value);
+                    // return date.getMonth() + "-" + date.getDate();
                 }
             },
             style: {color: '#9aa2a9', fill: '#9aa2a9'},
@@ -72,7 +73,7 @@ function drawMacd(diff_data,dea_data,bar_data,date_data) {
                     if (this.value > 1 || this.value < -1 || this.value == 0) {
                         return BigNumber(this.value).round(2, BigNumber.ROUND_DOWN).toF(2);
                     } else if (this.value < 1 && this.value > 0 || this.value > -1 && this.value < 0){
-                        return BigNumber(this.value * 10000).round(4, BigNumber.ROUND_DOWN).toF(4);
+                        return BigNumber(this.value * 1000).round(4, BigNumber.ROUND_DOWN).toF(4);
                     }
                 }
             }
