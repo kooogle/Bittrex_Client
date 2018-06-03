@@ -49,7 +49,7 @@ class User < ActiveRecord::Base
     push_url = 'https://pushbear.ftqq.com/sub'
     res = Faraday.get do |req|
       req.url push_url
-      req.params['sendkey'] = '1525-8b323372634c1cbd4f575e1628802149'
+      req.params['sendkey'] = '3969-7430d6c874dc6c071f4a20d1d92b4935'
       req.params['text'] = title
       req.params['desp'] = content
     end
