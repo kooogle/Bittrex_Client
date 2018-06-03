@@ -1,3 +1,4 @@
+
 function drawPrice(data, ticker) {
   var valueDecimals = ticker == 'usdt' ? 2 : 8;
   $('#price-chart').highcharts({
