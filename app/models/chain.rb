@@ -19,7 +19,7 @@ class Chain < ActiveRecord::Base
 
 
   def self.amplitude(old_price,new_price)
-    return ((new_price - old_price) / old_price.to_f * 100).to_i
+    return ((new_price - old_price) / old_price.to_f * 100).round(2)
   end
 
   def last_price
