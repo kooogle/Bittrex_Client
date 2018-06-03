@@ -10,7 +10,7 @@ class Users::SessionsController < Devise::SessionsController
   # POST /resource/sign_in
   def create
     super
-    cookies.signed[:user_id] = current_user.id if params[:user][:remember_me]
+    cookies.signed[:user_id] = current_user.id if params[:user][:remember_me] == '1'
   end
 
   # DELETE /resource/sign_out
