@@ -2,7 +2,7 @@
 <div class="box-body">
   <div class="col-md-5">
     <div class="form-group has-error">
-      <label>区块</label>
+      <label>交易对</label>
       <div class="input-group">
         <div class="input-group-addon">
           <i class="fa fa-btc"></i>
@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="form-group has-error">
-      <label>交易</label>
+      <label>交易类型</label>
       <div class="input-group">
         <div class="input-group-addon">
           <i class="fa fa-gg"></i>
@@ -20,7 +20,7 @@
       </div>
     </div>
     <div class="form-group has-error">
-      <label>状态</label>
+      <label>订单状态</label>
       <div class="input-group">
         <div class="input-group-addon">
           <i class="fa fa-gg"></i>
@@ -28,7 +28,7 @@
         <%= f.select(:state,[['已下单',true],['未激活',false]], {prompt:'请选择状态'},{:class => 'form-control'}) %>
       </div>
     </div>
-    <div class="form-group has-error">
+<!--     <div class="form-group has-error">
       <label>回购</label>
       <div class="input-group">
         <div class="input-group-addon">
@@ -36,8 +36,8 @@
         </div>
         <%= f.select(:repurchase,[['已回购',true],['待出售',false]], {prompt:'请选择回购'},{:class => 'form-control'}) %>
       </div>
-    </div>
-    <div class="form-group has-error">
+    </div> -->
+<!--     <div class="form-group has-error">
       <label>频率</label>
       <div class="input-group">
         <div class="input-group-addon">
@@ -45,14 +45,14 @@
         </div>
         <%= f.select(:frequency,[['高频',true],['低频',false]], {prompt:'请选择频率'},{:class => 'form-control'}) %>
       </div>
-    </div>
+    </div> -->
     <div class="form-group has-error">
       <label>数量</label>
       <div class="input-group">
         <div class="input-group-addon">
           <i class="fa fa-codepen"></i>
         </div>
-        <%= f.text_field :amount, class:'form-control', placeholder:'（必填* 区块数量）' %>
+        <%= f.text_field :amount, class:'form-control', placeholder:'（必填* 交易数量）' %>
       </div>
     </div>
     <div class="form-group has-error">
@@ -61,7 +61,7 @@
         <div class="input-group-addon">
           <i class="fa fa-cny"></i>
         </div>
-        <%= f.text_field :price, class:'form-control', placeholder:'（必填* 挂单价格）' %>
+        <%= f.text_field :price, class:'form-control', placeholder:'（必填* 预期价格）' %>
       </div>
     </div>
     <div class="form-group has-error">
@@ -92,3 +92,15 @@
   </div>
 </div>
 <% end %>
+<% content_for :script_footer do %>
+<script type="text/javascript">
+  $('#order_chain_id').change(function() {
+    if (this.value) {
+      $.get("/blocks/orders/market_price?chain=" + this.value,function(data){
+        $('#order_amount').val(data.amount);
+        $('#order_price').val(data.price);
+      });
+    }
+  })
+</script>
+<% end%>

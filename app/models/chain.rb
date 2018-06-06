@@ -26,6 +26,14 @@ class Chain < ActiveRecord::Base
     tickers.last.last_price
   end
 
+  def market_price
+    market["Last"] || last_price
+  end
+
+  def available_amount
+    wallet.try(:balance) || 0
+  end
+
   def full_name
     "#{block}-#{currency}"
   end

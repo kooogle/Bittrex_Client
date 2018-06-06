@@ -31,7 +31,7 @@ class Order < ActiveRecord::Base
   end
 
   def stating
-    {true=>'已挂单',false=>'未激活'}[state]
+    {true=>'已下单',false=>'未激活'}[state]
   end
 
   def frequency_cn
@@ -79,7 +79,7 @@ class Order < ActiveRecord::Base
       end
       if result['success']
         update_attributes(state:true, result:result['result']['uuid'])
-        sync_repurchase rescue {} if sell? #卖出执行回单
+        # sync_repurchase rescue {} if sell? #卖出执行回单
         # change_point_profit rescue {} unless frequency #低频买卖才同步
         return true
       end

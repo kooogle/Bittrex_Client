@@ -49,6 +49,11 @@ class Blocks::OrdersController < Blocks::BaseController
     redirect_to :back
   end
 
+  def market_price
+    currency = Chain.find(params[:chain])
+    render json:{amount:currency.available_amount,price:currency.market_price}
+  end
+
   private
     def set_order
       @order = Order.find(params[:id])

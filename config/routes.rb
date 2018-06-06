@@ -83,6 +83,7 @@ Rails.application.routes.draw do
     resources :orders do
       collection do
         get 'cancel'
+        get 'market_price'
       end
     end
     resources :balances do
