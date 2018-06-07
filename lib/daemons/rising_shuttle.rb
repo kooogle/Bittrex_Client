@@ -23,9 +23,7 @@ while($running) do
       prev_price = block.prev_day_price || ticker['PrevDay']
       last_price = ticker['Last']
       point = block.point || block.build_point(weights:1)
-      if 800 < reset_time && reset_time < 804
-        point.update_attributes(weights:1)
-      end
+      point.update_attributes(weights:1) if reset_time < 5
       weights = point.weights
       magnitude = Chain.amplitude(prev_price,last_price)
       if magnitude >= weights
