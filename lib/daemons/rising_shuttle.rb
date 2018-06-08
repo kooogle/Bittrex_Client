@@ -26,12 +26,12 @@ while($running) do
       point.update_attributes(weights:1) if reset_time < 5
       weights = point.weights
       magnitude = Chain.amplitude(prev_price,last_price)
-      if magnitude >= weights
+      if magnitude > weights
         block.bull_market_tip(magnitude,ticker)
-        point.increment!(:weights)
-      elsif magnitude < 0 && magnitude.abs >= weights
+        point.update_attributes(weights: magnitude)
+      elsif magnitude < 0 && magnitude.abs > weights
         block.bear_market_tip(magnitude,ticker)
-        point.increment!(:weights)
+        point.update_attributes(weights: magnitude.abs)
       end
     rescue Exception => e
       Rails.logger.fatal e
