@@ -86,11 +86,11 @@ class Chain < ActiveRecord::Base
 
   def to_usdt
     if currency == 'USDT'
-      return (market["Bid"]).round(2)
+      return (market["Last"])
     elsif currency == 'ETH'
-      return ((Chain.where(block:'ETH',currency:'USDT').first.market["Bid"]) * last_price).round(2)
+      return ((Chain.where(block:'ETH',currency:'USDT').first.market["Last"]) * last_price)
     elsif currency == 'BTC'
-      return ((Chain.where(block:'BTC',currency:'USDT').first.market["Bid"]) * last_price).round(2)
+      return ((Chain.where(block:'BTC',currency:'USDT').first.market["Last"]) * last_price)
     end
   end
 
