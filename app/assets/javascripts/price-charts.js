@@ -1,6 +1,6 @@
 
 function drawPrice(data, ticker) {
-  var valueDecimals = ticker == 'usdt' ? 2 : 8;
+  var valueDecimals = ticker == 'usdt' ? 4 : 8;
   $('#price-chart').highcharts({
     chart: {backgroundColor: null},
     tooltip: {backgroundColor: "#e2e2e2", borderColor: '#fff', style: {"color": "#2f2f2f"}},

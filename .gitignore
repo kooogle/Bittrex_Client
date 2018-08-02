@@ -12,6 +12,7 @@
 !/log/.keep
 /tmp
 /config/settings.rb
+/config/deploy.rb
 /config/deploy/online.rb
 /config/deploy/hongkong.rb
 /.rvmrc
