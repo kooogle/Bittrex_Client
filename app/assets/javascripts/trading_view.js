@@ -1,3 +1,3 @@
-//= require datafeeds/udf/dist/bundle.js
-//= require datafeeds/udf/dist/polyfills.js
-//= require charting_library/charting_library.min.js
+//= require trading_bundle.js
+//= require trading_polyfills.js
+//= require trading_library.min.js
