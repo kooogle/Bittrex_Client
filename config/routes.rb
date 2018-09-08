@@ -67,7 +67,7 @@ Rails.application.routes.draw do
     put 'reset_password',to:'users/passwords#update'
   end
   root 'welcome#index'
-
+  get '/markets/(:market)', to: 'blocks/dashboard#tradingview', as: :tradingview
   namespace :blocks do
     get '/', to:'dashboard#index', as: :ticker
     get 'pending_orders', to: 'dashboard#pending', as: :pending
@@ -101,6 +101,7 @@ Rails.application.routes.draw do
     get 'hit_markets', to:'quotes#hit_markets'
     get 'hit_clear_open_orders', to:'quotes#hit_clear_open_orders'
     get 'hit_clear_orders', to:'quotes#hit_clear_business_orders'
+    get 'trading_views/config', to:'trading_views#trading_config'
     resources :stocks do
       collection do
         get 'quote'
@@ -113,6 +114,13 @@ Rails.application.routes.draw do
     resources :wechats do
       collection do
         get 'auth'
+      end
+    end
+    resources :trading_views do
+      collection do
+        get 'symbols'
+        get 'history'
+        get 'time'
       end
     end
   end

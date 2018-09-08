@@ -45,4 +45,9 @@ class Blocks::DashboardController < Blocks::BaseController
     @orders
   end
 
+  def tradingview
+
+  end
+
+
 end

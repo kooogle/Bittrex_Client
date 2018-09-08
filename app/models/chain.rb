@@ -252,4 +252,14 @@ class Chain < ActiveRecord::Base
     User.wechat_group_notice(title,content)
   end
 
+  def kelly_profit
+
+  end
+
+  def self.market_list
+    market_hash = {}
+    Chain.all.order(block: :asc).map {|x| market_hash[x.markets] = x.id }
+    market_hash
+  end
+
 end

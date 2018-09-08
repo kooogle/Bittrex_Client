@@ -37,9 +37,9 @@
                 <td><%= (item['Limit'] * item['Quantity']).round(2) %></td>
                 <td><%= item['Opened'].to_time.strftime('%F %T') %></td>
                 <td>
-                  <a href="<%= cancel_blocks_orders_path(uuid:item['OrderUuid']) %>" class="btn bg-aqua btn-flat">
-                    <i class="fa fa-shower"></i>
-                    撤单
+                  <a href="<%= cancel_blocks_orders_path(uuid:item['OrderUuid']) %>" class="btn bg-red btn-app">
+                    <i class="fa fa-minus-square"></i>
+                    撤销
                   </a>
                 </td>
               </tr>
