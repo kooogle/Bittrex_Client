@@ -16,7 +16,7 @@
     var widget = window.tvWidget = new TradingView.widget({
       datafeed: new window.Datafeeds.UDFCompatibleDatafeed(url,60000),
       symbol: "<%= params[:market] || 'USDT-BTC' %>",
-      interval: '30',
+      interval: '60',
       theme: 'Grey',
       container_id: 'tv_chart_container',
       library_path: '/trading_library/',
