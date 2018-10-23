@@ -4,9 +4,6 @@ class Api::QuotesController < ApplicationController
     Chain.all.each do |item|
       item.generate_ticker rescue nil
     end
-    Chain.all.each do |item|
-      extremum_report(item) if item.point && item.point.state
-    end
     render json:{code:200}
   end
 
@@ -226,12 +223,12 @@ private
   end
 
   def up_sms_notice(block)
-    content = "#{block.block} 最高价值，价格: #{block.tickers.last.last_price} #{block.currency}, 价值: #{block.to_usdt} USDT"
+    content = "#{block.block} 上涨行情，价格: #{block.tickers.last.last_price} #{block.currency}, 价值: #{block.to_usdt} USDT"
     User.sms_notice(content)
   end
 
   def down_sms_notice(block)
-    content = "#{block.block} 最低价值，价格: #{block.tickers.last.last_price} #{block.currency}, 价值: #{block.to_usdt} USDT"
+    content = "#{block.block} 下跌行情，价格: #{block.tickers.last.last_price} #{block.currency}, 价值: #{block.to_usdt} USDT"
     User.sms_notice(content)
   end
 

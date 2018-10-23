@@ -23,13 +23,13 @@ while($running) do
       prev_price = block.prev_day_price || ticker['PrevDay']
       last_price = ticker['Last']
       point = block.point || block.build_point(weights:1)
-      point.update_attributes(weights:1) if reset_time < 5
+      point.update_attributes(weights:1) if reset_time < 2
       weights = point.weights
       magnitude = Chain.amplitude(prev_price,last_price)
-      if magnitude > weights
+      if magnitude > weights && weights > 9
         block.bull_market_tip(magnitude,ticker)
         point.update_attributes(weights: magnitude)
-      elsif magnitude < 0 && magnitude.abs > weights
+      elsif magnitude < 0 && magnitude.abs > weights && weights > 9
         block.bear_market_tip(magnitude,ticker)
         point.update_attributes(weights: magnitude.abs)
       end
@@ -37,5 +37,5 @@ while($running) do
       Rails.logger.fatal e
     end
   end
-  sleep 180
+  sleep 60
 end

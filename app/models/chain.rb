@@ -243,13 +243,17 @@ class Chain < ActiveRecord::Base
   def bull_market_tip(magnitude,ticker)
     title = "#{block} 牛市归来"
     content = "涨幅 #{magnitude}口价格 #{ticker['Last']}口时间 #{Time.now.strftime('%H:%M')}"
+    sms_content = "#{full_name}; 上涨：⬆️ #{magnitude}、价格: #{tickers.last.last_price} #{currency} 时间：#{Time.now.strftime('%H:%M')}"
     User.wechat_group_notice(title,content)
+    User.sms_notice(sms_content) if point.try(:state)
   end
 
   def bear_market_tip(magintude,ticker)
     title = "#{block} 熊市来袭"
     content = "跌幅 -#{magintude}口价格 #{ticker['Last']}口时间 #{Time.now.strftime('%H:%M')}"
+    sms_content = "#{full_name}; 下跌：⬇️ #{magnitude}、价格: #{tickers.last.last_price} #{currency} 时间：#{Time.now.strftime('%H:%M')}"
     User.wechat_group_notice(title,content)
+    User.sms_notice(sms_content) if point.try(:state)
   end
 
   def kelly_profit
