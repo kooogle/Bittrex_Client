@@ -26,10 +26,10 @@ while($running) do
       point.update_attributes(weights:1) if reset_time < 2
       weights = point.weights
       magnitude = Chain.amplitude(prev_price,last_price)
-      if magnitude > weights && weights > 9
+      if magnitude > weights && weights > 5
         block.bull_market_tip(magnitude,ticker)
         point.update_attributes(weights: magnitude)
-      elsif magnitude < 0 && magnitude.abs > weights && weights > 9
+      elsif magnitude < 0 && magnitude.abs > weights && weights > 5
         block.bear_market_tip(magnitude,ticker)
         point.update_attributes(weights: magnitude.abs)
       end
