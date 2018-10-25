@@ -64,4 +64,14 @@ class User < ActiveRecord::Base
     end
   end
 
+  def self.dingding_notice(content = '内容')
+    push_url = 'https://oapi.dingtalk.com/robot/send?access_token=716302851a7aa967ca557056a9b5577d0b1aaefd41a8e65b928188f952819914'
+    body_params ={ msgtype:'text', text:{ content: content } }
+    res = Faraday.post do |req|
+      req.url push_url
+      req.headers['Content-Type'] = 'application/json'
+      req.body = body_params.to_json
+    end
+  end
+
 end
