@@ -37,7 +37,6 @@ while($running) do
       Rails.logger.fatal e
     end
   end
-  Rails.logger.auto_flushing = true
   Rails.logger.info "This daemon price notice running at #{Time.now}.\n"
 
   sleep 60

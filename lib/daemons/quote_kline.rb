@@ -19,7 +19,6 @@ while($running) do
     item.generate_ticker rescue nil
   end
   # Replace this with your code
-  Rails.logger.auto_flushing = true
   Rails.logger.info "This daemon Kline running at #{Time.now}.\n"
 
   sleep 900
