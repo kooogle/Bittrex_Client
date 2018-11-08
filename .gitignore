@@ -13,6 +13,5 @@
 /tmp
 /config/settings.rb
 /config/deploy.rb
-/config/deploy/online.rb
-/config/deploy/hongkong.rb
+/config/deploy/
 /.rvmrc
