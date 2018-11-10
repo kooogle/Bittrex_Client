@@ -39,15 +39,13 @@
                 </td>
                 <td>
                   <a href="<%= all_out_blocks_balance_path(item) %>" class="btn bg-black btn-flat" data-confirm="确定要清仓<%= item.block %>？">
-                    一把梭
+                    <i class="fa fa-paper-plane-o"></i>
                   </a>
                   <a href="<%= edit_blocks_balance_path(item) %>" class="btn bg-orange btn-flat">
                     <i class="glyphicon glyphicon-edit"></i>
-                    编辑
                   </a>
                   <a href="<%= blocks_balance_path(item) %>" class="btn bg-red btn-flat" data-method="delete" data-confirm="确定删除余额信息吗？">
                     <i class="glyphicon glyphicon-trash"></i>
-                    删除
                   </a>
                 </td>
               </tr>
