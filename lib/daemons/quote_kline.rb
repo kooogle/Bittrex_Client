@@ -18,8 +18,7 @@ while($running) do
   Chain.all.each do |item|
     item.generate_ticker rescue nil
   end
-  # Replace this with your code
-  Rails.logger.info "This daemon Kline running at #{Time.now}.\n"
+  Rails.logger.info "\n This daemon Kline running at #{Time.now}.\n"
 
   sleep 900
 end

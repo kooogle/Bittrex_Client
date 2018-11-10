@@ -2,7 +2,7 @@ class Blocks::DashboardController < Blocks::BaseController
 
   def index
     block = params[:block] || Chain.first.id
-    sta_time = params[:start] || (Date.current - 6.days).to_s
+    sta_time = params[:start] || (Date.current - 1.days).to_s
     end_time = params[:end] || Date.current.to_s
     @block = Chain.find(block)
     tickers = @block.tickers.where("mark >= ? AND mark <= ?",sta_time,end_time)
