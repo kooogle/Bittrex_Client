@@ -15,10 +15,12 @@ Signal.trap("TERM") do
 end
 
 while($running) do
+  start_at = Time.now
   Chain.all.each do |item|
     item.generate_ticker rescue nil
   end
+  consume = Time.now - start_at
   Rails.logger.info "\n This daemon Kline running at #{Time.now}.\n"
 
-  sleep 900
+  sleep (900 - consume)
 end
