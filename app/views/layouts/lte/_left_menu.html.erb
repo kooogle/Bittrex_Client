@@ -20,7 +20,7 @@
   <ul class="sidebar-menu">
     <li class="header">交易大厅</li>
     <li class="treeview <%= 'active' if controller_name == 'dashboard' && action_name == 'tradingview'%>">
-      <a href="<%= tradingview_path(Chain.first.markets) %>" target="_self">
+      <a href="<%= tradingview_path(Chain.first.markets) if Chain.first %>" target="_self">
         <i class="fa fa-bar-chart"></i> <span> 价格趋势</span>
       </a>
     </li>
