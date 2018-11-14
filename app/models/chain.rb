@@ -242,14 +242,14 @@ class Chain < ActiveRecord::Base
 
   def bull_market_tip(magnitude,ticker)
     # User.wechat_group_notice(title,content)
-    sms_content = "🔔😋#{full_name}; 🚀：⬆️ #{magnitude}、💸：#{tickers.last.last_price} #{currency}、 #{User.emoji_time}：#{Time.now.strftime('%H:%M')}"
+    sms_content = "🔔#{full_name}; 🚀：⬆️ #{magnitude}、💸：#{ticker["Last"]} #{currency}、 #{Chain.emoji_time}：#{Time.now.strftime('%H:%M')}"
     User.dingding_notice(sms_content)
     User.sms_notice(sms_content) if point.try(:state)
   end
 
   def bear_market_tip(magintude,ticker)
     # User.wechat_group_notice(title,content)
-    sms_content = "🔔😭#{full_name}; ⚓️：⬇️ #{magnitude}、💵：#{tickers.last.last_price} #{currency} #{User.emoji_time}：#{Time.now.strftime('%H:%M')}"
+    sms_content = "🔔#{full_name}; ⚓️：⬇️ #{magnitude}、💵：#{ticker["Last"]} #{currency} #{Chain.emoji_time}：#{Time.now.strftime('%H:%M')}"
     User.dingding_notice(sms_content)
     User.sms_notice(sms_content) if point.try(:state)
   end
