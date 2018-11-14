@@ -57,6 +57,15 @@ class Chain < ActiveRecord::Base
     end
   end
 
+  def prev_day_low_price
+    last_day = tickers.where(mark:Date.current.yesterday).map(&:last_price)
+    if last_day.any?
+      last_day.min
+    else
+      return nil
+    end
+  end
+
   def buy_price
     buy_business = buy_business
     if buy_business.count > 0
@@ -242,14 +251,14 @@ class Chain < ActiveRecord::Base
 
   def bull_market_tip(magnitude,ticker)
     # User.wechat_group_notice(title,content)
-    sms_content = "🔔#{full_name}; 🚀：⬆️ #{magnitude}、💸：#{ticker["Last"]} #{currency}、 #{Chain.emoji_time}：#{Time.now.strftime('%H:%M')}"
+    sms_content = "🔔#{full_name}; ⬆️ #{magnitude}、💸：#{ticker["Last"]} #{currency}、 #{Chain.emoji_time}：#{Time.now.strftime('%H:%M')}"
     User.dingding_notice(sms_content)
     User.sms_notice(sms_content) if point.try(:state)
   end
 
   def bear_market_tip(magintude,ticker)
     # User.wechat_group_notice(title,content)
-    sms_content = "🔔#{full_name}; ⚓️：⬇️ #{magnitude}、💵：#{ticker["Last"]} #{currency} #{Chain.emoji_time}：#{Time.now.strftime('%H:%M')}"
+    sms_content = "🔔#{full_name}; ⬇️ #{magnitude}、💵：#{ticker["Last"]} #{currency} #{Chain.emoji_time}：#{Time.now.strftime('%H:%M')}"
     User.dingding_notice(sms_content)
     User.sms_notice(sms_content) if point.try(:state)
   end
