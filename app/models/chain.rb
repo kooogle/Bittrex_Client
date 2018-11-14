@@ -256,7 +256,7 @@ class Chain < ActiveRecord::Base
     User.sms_notice(sms_content) if point.try(:state)
   end
 
-  def bear_market_tip(magintude,ticker)
+  def bear_market_tip(magnitude,ticker)
     # User.wechat_group_notice(title,content)
     sms_content = "🔔#{full_name}; ⬇️ #{magnitude}、💵：#{ticker["Last"]} #{currency} #{Chain.emoji_time}：#{Time.now.strftime('%H:%M')}"
     User.dingding_notice(sms_content)
