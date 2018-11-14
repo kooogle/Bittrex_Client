@@ -19,7 +19,7 @@ while($running) do
   Chain.all.each do |block|
     begin
       ticker = block.market
-      prev_price = prev_day_low_price || ticker['PrevDay']
+      prev_price = block.prev_day_low_price || ticker['PrevDay']
       last_price = ticker['Last']
       point = block.point || block.build_point(weights:1)
       point.update_attributes(weights:1) if reset_time < 2
